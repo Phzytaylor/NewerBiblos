@@ -61,14 +61,14 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     
     func observeMessages(){
     
-        guard let uid = FIRAuth.auth()?.currentUser?.uid, let toId = user?.id else{
+        guard let uid = Auth.auth().currentUser?.uid, let toId = user?.id else{
         
             return
         
         }
         
         let userMessagesRef =
-        FIRDatabase.database().reference().child("user-messages").child(uid).child(toId)
+            Database.database().reference().child("user-messages").child(uid).child(toId)
         
         
         userMessagesRef.observe(.childAdded, with: { (snapshot) in
@@ -76,7 +76,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
             
             let messageId = snapshot.key
             
-            let messagesRef = FIRDatabase.database().reference().child("messages").child(messageId)
+            let messagesRef = Database.database().reference().child("messages").child(messageId)
             
             
             messagesRef.observe(.value, with: { (snapshot) in
@@ -102,7 +102,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                     
                     
                     
-                    if message.chatPartnerId() != FIRAuth.auth()?.currentUser?.uid{
+                    if message.chatPartnerId() != Auth.auth().currentUser?.uid{
                     
                     
                         
@@ -129,7 +129,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                     
                    // print(self.willPush, "this is evil!")
                     
-                    print("This is the person I am talking to id , \(message.chatPartnerId())","THIS IS MY ID \(FIRAuth.auth()?.currentUser?.uid as String!)")
+                    print("This is the person I am talking to id , \(message.chatPartnerId())","THIS IS MY ID \(Auth.auth().currentUser?.uid as String!)")
                     
                     DispatchQueue.main.async(execute: {
                         self.collectionView?.reloadData()
@@ -149,7 +149,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     }
     
     var toID: String?
-    var FromID = FIRAuth.auth()?.currentUser?.uid
+    var FromID = Auth.auth().currentUser?.uid
     
     lazy var inputTextField: UITextField = {
         let textField = UITextField()
@@ -164,7 +164,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
   
     
     override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Chalkduster", size: 20)!, NSForegroundColorAttributeName: UIColor.white]
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSAttributedStringKey.font: UIFont(name: "Helvetica", size: 20)!, NSAttributedStringKey.foregroundColor: UIColor.white]
     }
     
     
@@ -176,11 +176,13 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
      UIApplication.shared.statusBarStyle = .lightContent
        
         
-        navigationController!.navigationBar.barTintColor = UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
+        //navigationController!.navigationBar.barTintColor = UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
         
-        self.navigationController!.navigationBar.tintColor = UIColor.white
+        navigationController?.navigationBar.barTintColor = .black
         
-        self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Chalkduster", size: 20)!, NSForegroundColorAttributeName: UIColor.white]
+       // self.navigationController!.navigationBar.tintColor = UIColor.white
+        
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSAttributedStringKey.font: UIFont(name: "Helvetica", size: 20)!, NSAttributedStringKey.foregroundColor: UIColor.white]
         
         
         
@@ -194,9 +196,9 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         })
 
         
-        let userNameForPush = FIRAuth.auth()?.currentUser?.uid as String!
+        let userNameForPush = Auth.auth().currentUser?.uid as String!
         
-        let userNameForPushName = FIRDatabase.database().reference().child("users").child(userNameForPush!).child("name")
+        let userNameForPushName = Database.database().reference().child("users").child(userNameForPush!).child("name")
         
         
        
@@ -295,7 +297,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         NotificationCenter.default.removeObserver(self)
     }
     
-    func handleKeyboardWillShow(_ notification: Notification) {
+    @objc func handleKeyboardWillShow(_ notification: Notification) {
         let keyboardFrame = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as AnyObject).cgRectValue
         let keyboardDuration = (notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as AnyObject).doubleValue
         
@@ -307,7 +309,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         }) 
     }
     
-    func handleKeyboardWillHide(_ notification: Notification) {
+    @objc func handleKeyboardWillHide(_ notification: Notification) {
         let keyboardDuration = (notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as AnyObject).doubleValue
         
         containerViewBottomAnchor?.constant = 0
@@ -350,11 +352,11 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     
         if let profileImageUrl = self.user?.profileImageUrl{
         
-            cell.profileImageView.loadImageUsingCacheWithUrlString(profileImageUrl)
+            cell.profileImageView.loadImageUsingCacheWithUrlString(profileImageUrl, gradient: false)
         
         }
     
-        if message.fromId == FIRAuth.auth()?.currentUser?.uid{
+        if message.fromId == Auth.auth().currentUser?.uid{
         
             //outgoing blue
             cell.bubbleView.backgroundColor = UIColor(red: 0.1216, green: 0.8275, blue: 0, alpha: 1.0)
@@ -418,7 +420,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     fileprivate func estimateFrameForText(_ text: String) -> CGRect {
         let size = CGSize(width: 200, height: 1000)
         let options = NSStringDrawingOptions.usesFontLeading.union(.usesLineFragmentOrigin)
-        return NSString(string: text).boundingRect(with: size, options: options, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 16)], context: nil)
+        return NSString(string: text).boundingRect(with: size, options: options, attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 16)], context: nil)
     }
     
     
@@ -468,60 +470,43 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         separatorLineView.heightAnchor.constraint(equalToConstant: 1).isActive = true
     }
     
-    func handleSend() {
-        let ref = FIRDatabase.database().reference().child("messages")
+    @objc func handleSend() {
+        let ref = Database.database().reference().child("messages")
         let childRef = ref.childByAutoId()
         //is it there best thing to include the name inside of the message node
-        
-      
-        
-        
-        
+
         let toId = user!.id!
         
         
-        if toId != FIRAuth.auth()?.currentUser?.uid{
+        if toId != Auth.auth().currentUser?.uid{
         
             if pushToUser != nil {
-            
-                
-                
-                if FIRAuth.auth()?.currentUser?.displayName as String! == nil {
-                
+                if Auth.auth().currentUser?.displayName as String! == nil {
                 
                     userNameForPush = userName
-                
                 
                 }
                 
                 else{
-                    userNameForPush = FIRAuth.auth()?.currentUser?.displayName as String!
+                    userNameForPush = Auth.auth().currentUser?.displayName as String!
                 
                 }
                 
                 OneSignal.postNotification(["headings":["en":"New Message"],"contents": ["en": "You have a new mesage from \(userNameForPush as String!) 📚📚"],"include_player_ids": ["\(pushToUser as String!)"], "ios_badgeType":"Increase", "ios_badgeCount":1])
                 print(pushToUser, "THIS IS PUSHTOUSER")
                 print(" I AM WORKING")
-            
-            
             }
-            
-            
-            
+           
             if pushToUser == nil{
-                
-                
-                
-                if FIRAuth.auth()?.currentUser?.displayName as String! == nil {
+             
+                if Auth.auth().currentUser?.displayName as String! == nil {
                     
                     
                     userNameForPush = userName
-                    
-                    
                 }
                     
                 else{
-                    userNameForPush = FIRAuth.auth()?.currentUser?.displayName as String!
+                    userNameForPush = Auth.auth().currentUser?.displayName as String!
                     
                 }
                 
@@ -531,25 +516,17 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                 
                 print(" I AM WORKING TOO")
             
-            
-            
             }
         
         }
-        
-        
-       
-       
+
        // let message = Message()
 
         
-        let fromId = FIRAuth.auth()!.currentUser!.uid
+        let fromId = Auth.auth().currentUser!.uid
         //let timestamp: NSNumber = NSNumber(Int(Date().timeIntervalSince1970))
         let timestamp: NSNumber = NSNumber(value: Int(NSDate().timeIntervalSince1970))
-        
-        
-        
-        
+      
         if pushToUser != nil {
         
             self.theUserPushed = pushToUser
@@ -563,9 +540,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         
         
         }
-        
-        
-        
+      
         let values = ["text": inputTextField.text!, "toId": toId, "fromId": fromId, "timestamp": timestamp, "toPushingID": theUserPushed, "fromPushingID": currentLogedInUserPushId as String!  ] as [String : Any]
         //        childRef.updateChildValues(values)
         
@@ -592,22 +567,25 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
             
             self.inputTextField.text = nil
             
-         
             
-            let userMessagesRef = FIRDatabase.database().reference().child("user-messages").child(fromId).child(toId)
+            let userMessagesRef = Database.database().reference().child("user-messages").child(fromId).child(toId)
             
-            
-         
             
             let messageId = childRef.key
             
-          
-            
-            
             userMessagesRef.updateChildValues([messageId: 1])
             
-            let recipientUserMessagesRef = FIRDatabase.database().reference().child("user-messages").child(toId).child(fromId)
-                recipientUserMessagesRef.updateChildValues([messageId: 1])}
+            let recipientUserMessagesRef = Database.database().reference().child("user-messages").child(toId).child(fromId)
+            
+            let theMessageID = childRef.key
+            
+            print(theMessageID)
+            
+            
+            
+            recipientUserMessagesRef.updateChildValues([theMessageID: 1])
+            
+            }
         
     }
     

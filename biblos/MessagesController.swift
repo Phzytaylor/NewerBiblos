@@ -10,6 +10,7 @@ import UIKit
 import Firebase
 import FirebaseDatabase
 import FBSDKCoreKit
+import DZNEmptyDataSet
 // FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
 // Consider refactoring the code to use the non-optional operators.
 fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
@@ -35,20 +36,59 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 }
 
 
- let DataReference = FIRDatabase.database().reference(fromURL: "https://biblos-1.firebaseio.com/")
+let DataReference = Database.database().reference(fromURL: "https://biblos-1.firebaseio.com/")
 
 
-class MessagesController: UITableViewController {
+class MessagesController: UITableViewController,DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
+    
+    
+    func title(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
+        let str = "You have no messages yet."
+        let attrs = [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline)]
+        return NSAttributedString(string: str, attributes: attrs)
+    }
+    
+    func description(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
+        let str = "You can send new messages by selecting a book or looking at people who have requested your book"
+        let attrs = [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: UIFontTextStyle.body)]
+        return NSAttributedString(string: str, attributes: attrs)
+    }
+    
+    func image(forEmptyDataSet scrollView: UIScrollView) -> UIImage? {
+        return UIImage(named: "OpenBook.png")
+    }
+    
+    func backgroundColor(forEmptyDataSet scrollView: UIScrollView) -> UIColor {
+        return UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
+        
+    }
+    
+//    
+//    func buttonTitle(forEmptyDataSet scrollView: UIScrollView, for state: UIControlState) -> NSAttributedString? {
+//        let str = "Tap Me To Upload Your Book"
+//        let attrs = [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: UIFontTextStyle.callout), NSAttributedStringKey.foregroundColor: UIColor.white]
+//        
+//        return NSAttributedString(string: str, attributes: attrs)
+//    }
+    
+    func emptyDataSet(_ scrollView: UIScrollView, didTap button: UIButton) {
+        /*let ac = UIAlertController(title: "Button tapped!", message: nil, preferredStyle: .alert)
+         ac.addAction(UIAlertAction(title: "Hurray", style: .default))
+         present(ac, animated: true)
+         */
+        
+        //self.performSegue(withIdentifier: "uploadBook", sender: AnyObject.self)
+    }
 
     let cellId = "cellId"
     
     
-    func didLogOut(){
+    @objc func didLogOut(){
         
         
         //signs user out of firebase app
         
-        try! FIRAuth.auth()!.signOut()
+        try! Auth.auth().signOut()
         
         //sign user out of facebook app
         
@@ -68,6 +108,24 @@ class MessagesController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        var tutboard = UIStoryboard(name: "Tutorials", bundle: nil)
+        
+       
+        
+        
+        
+        if(!UserDefaults.standard.bool(forKey: "Messagefirstlaunch1.0")){
+            //Put any code here and it will be executed only once.
+             present(tutboard.instantiateViewController(withIdentifier: "chatTut"), animated: true, completion: nil)
+            print("Is a first launch")
+            UserDefaults.standard.set(true, forKey: "Messagefirstlaunch1.0")
+            UserDefaults.standard.synchronize();
+        
+        }
+        
+        tableView.emptyDataSetSource = self
+        tableView.emptyDataSetDelegate = self
+        tableView.tableFooterView = UIView()
         
          UIApplication.shared.statusBarStyle = .lightContent
         
@@ -76,14 +134,16 @@ class MessagesController: UITableViewController {
         self.tabBarController!.navigationItem.title = "Messages"
         
         
-        self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Chalkduster", size: 20)!, NSForegroundColorAttributeName: UIColor.white]
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSAttributedStringKey.font: UIFont(name: "Helvetica", size: 20)!, NSAttributedStringKey.foregroundColor: UIColor.white]
         
         
         
         tabBarController?.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(didLogOut))
         
 
-        navigationController!.navigationBar.barTintColor = UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
+       // navigationController!.navigationBar.barTintColor = UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
+        
+        navigationController?.navigationBar.barTintColor = .black
         tabBarController?.navigationItem.rightBarButtonItem?.tintColor = UIColor.white
         
        observeUserMessages()
@@ -100,7 +160,7 @@ class MessagesController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         
-        guard let uid = FIRAuth.auth()?.currentUser?.uid else{
+        guard let uid = Auth.auth().currentUser?.uid else{
             return
         }
         
@@ -110,7 +170,7 @@ class MessagesController: UITableViewController {
         
         if let chatPartnerId = message.chatPartnerId(){
         
-        FIRDatabase.database().reference().child("user-messages").child(uid).child(chatPartnerId).removeValue(completionBlock: { (error, ref) in
+            Database.database().reference().child("user-messages").child(uid).child(chatPartnerId).removeValue(completionBlock: { (error, ref) in
             
             if error != nil{
             
@@ -132,7 +192,9 @@ class MessagesController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
          self.tabBarController?.navigationItem.titleView = nil
         self.tabBarController?.navigationItem.title = " Messages"
-        self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Chalkduster", size: 20)!, NSForegroundColorAttributeName: UIColor.white]
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSAttributedStringKey.font: UIFont(name: "Helvetica", size: 20)!, NSAttributedStringKey.foregroundColor: UIColor.white]
+        
+       // present(ChatTutorialViewController(), animated: true, completion: nil)
     }
     
     var messages = [Message] ()
@@ -141,15 +203,15 @@ class MessagesController: UITableViewController {
     
     
     func observeUserMessages() {
-        guard let uid = FIRAuth.auth()?.currentUser?.uid else {
+        guard let uid = Auth.auth().currentUser?.uid else {
             return
         }
         
-        let ref = FIRDatabase.database().reference().child("user-messages").child(uid)
+        let ref = Database.database().reference().child("user-messages").child(uid)
         ref.observe(.childAdded, with: { (snapshot) in
             
             let userId = snapshot.key
-            FIRDatabase.database().reference().child("user-messages").child(uid).child(userId).observe(.childAdded, with: { (snapshot) in
+            Database.database().reference().child("user-messages").child(uid).child(userId).observe(.childAdded, with: { (snapshot) in
                 
                 
                 let messageId = snapshot.key
@@ -190,7 +252,7 @@ class MessagesController: UITableViewController {
     
     
     fileprivate func fetchMessageWithMessageId(_ messageId: String) {
-        let messagesReference = FIRDatabase.database().reference().child("messages").child(messageId)
+        let messagesReference = Database.database().reference().child("messages").child(messageId)
         
         messagesReference.observeSingleEvent(of: .value, with: { (snapshot) in
             
@@ -217,7 +279,7 @@ class MessagesController: UITableViewController {
     
     var timer: Timer?
     
-    func handleReloadTable() {
+    @objc func handleReloadTable() {
         self.messages = Array(self.messagesDictionary.values)
         self.messages.sort(by: { (message1, message2) -> Bool in
             
@@ -264,7 +326,7 @@ class MessagesController: UITableViewController {
         }
         
         
-        let ref = FIRDatabase.database().reference().child("users").child(chatPartnerId)
+        let ref = Database.database().reference().child("users").child(chatPartnerId)
         
         
         ref.observe(.value, with: { (snapshot) in

@@ -19,10 +19,10 @@ import Kingfisher
 extension UIImage {
     public func imageRotatedByDegrees(_ degrees: CGFloat, flip: Bool) -> UIImage {
         let radiansToDegrees: (CGFloat) -> CGFloat = {
-            return $0 * (180.0 / CGFloat(M_PI))
+            return $0 * (180.0 / CGFloat.pi)
         }
         let degreesToRadians: (CGFloat) -> CGFloat = {
-            return $0 / 180.0 * CGFloat(M_PI)
+            return $0 / 180.0 * CGFloat.pi
         }
         
         // calculate the size of the rotated view's containing box for our drawing space
@@ -82,14 +82,14 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
     
     var postID: String!
     
- 
+    var bookID: [String]!
     
     
     
     
-    let dataBase = FIRDatabase.database()
+    let dataBase = Database.database()
     
-    var SecondResultArray: [FIRDataSnapshot]! = []
+    var SecondResultArray: [DataSnapshot]! = []
     
     var someString: String?{
     
@@ -119,13 +119,13 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
     
     func title(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
         let str = "There are no books here yet, but users like you can change that!"
-        let attrs = [NSFontAttributeName: UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline)]
+        let attrs = [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline)]
         return NSAttributedString(string: str, attributes: attrs)
     }
     
    func description(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
         let str = "Tap Below To Add A Book"
-        let attrs = [NSFontAttributeName: UIFont.preferredFont(forTextStyle: UIFontTextStyle.body)]
+    let attrs = [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: UIFontTextStyle.body)]
         return NSAttributedString(string: str, attributes: attrs)
     }
     
@@ -141,7 +141,7 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
     
     func buttonTitle(forEmptyDataSet scrollView: UIScrollView, for state: UIControlState) -> NSAttributedString? {
         let str = "Tap Me To Upload Your Book"
-        let attrs = [NSFontAttributeName: UIFont.preferredFont(forTextStyle: UIFontTextStyle.callout), NSForegroundColorAttributeName: UIColor.white]
+        let attrs = [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: UIFontTextStyle.callout), NSAttributedStringKey.foregroundColor: UIColor.white]
     
         return NSAttributedString(string: str, attributes: attrs)
     }
@@ -162,23 +162,28 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
         
         tableView.rowHeight = UITableViewAutomaticDimension
         
-        self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Chalkduster", size: 20)!, NSForegroundColorAttributeName: UIColor.white]
+        //self.navigationController?.navigationBar.titleTextAttributes = [ NSAttributedStringKey.font: UIFont(name: "Chalkduster", size: 20)!, NSAttributedStringKey.foregroundColorNSAttributedStringKey.foregroundColor: UIColor.white]
+        
+        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.font:UIFont(name: "Helvetica", size:20)!, NSAttributedStringKey.foregroundColor: UIColor.white]
     }
     
     override func viewDidLoad() {
         
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
+        title = someString
         tableView.tableFooterView = UIView()
         
         
-        tableView.backgroundView = UIImageView(image: UIImage(named: "ResultBooks.jpeg"))
+        //tableView.backgroundView = UIImageView(image: UIImage(named: "ResultBooks.jpeg"))
         
-        navigationController!.navigationBar.barTintColor = UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
+        //navigationController!.navigationBar.barTintColor = UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
+        
+        navigationController?.navigationBar.barTintColor = .black
         
        self.navigationController!.navigationBar.tintColor = UIColor.white
         
-        self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Chalkduster", size: 20)!, NSForegroundColorAttributeName: UIColor.white]
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSAttributedStringKey.font: UIFont(name: "Helvetica", size: 20)!, NSAttributedStringKey.foregroundColor: UIColor.white]
         
         
         let bookRef = dataBase.reference().child("books")
@@ -196,7 +201,7 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
                 for child in snapshot.children {
                     
                     
-                    self.SecondResultArray.append(child as! FIRDataSnapshot)
+                    self.SecondResultArray.append(child as! DataSnapshot)
                     //print(self.ResultArray)
                     
                     
@@ -227,6 +232,8 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
         tableView.estimatedRowHeight = 700
         
         tableView.rowHeight = UITableViewAutomaticDimension
+        
+        tableView.backgroundColor = .white
      
     }
     
@@ -272,22 +279,27 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
 
         // Configure the cell...
         
-        let bookSnapShot: FIRDataSnapshot! = self.SecondResultArray[indexPath.row]
+        let bookSnapShot: DataSnapshot! = self.SecondResultArray[indexPath.row]
         
-        let book = bookSnapShot.value as! Dictionary<String, String>
+        print("This is a key: " + bookSnapShot.key)
         
-        let Author = book["Author"] as String!
-        let Comment = book["Comment"] as String!
-        let Genre = book["Genre"] as String!
-        let User = book["User"] as String!
-        let title = book["title"] as String!
-        let bookPhoto = book["bookPhoto"] as String!
-        let userID = book["userID"] as String!
-        let userLocation = book["userLocation"] as String!
-        let bookRate = book["bookRating"] as String!
-        let userToBePushed = book["pushingID"] as String!
-        let bookLat = book["bookLat"] as String!
-        let bookLng = book["bookLng"] as String!
+        
+        
+        let book = bookSnapShot.value as! Dictionary<String, AnyObject>
+        
+        let Author = book["Author"] as? String!
+        let Comment = book["Comment"] as? String!
+        let Genre = book["Genre"] as? String!
+        let User = book["User"] as? String!
+        let title = book["title"] as? String!
+        let bookPhoto = book["bookPhoto"] as? String!
+        let userID = book["userID"] as? String!
+        let userLocation = book["userLocation"] as? String!
+        let bookRate = book["bookRating"] as? String!
+        let userToBePushed = book["pushingID"] as? String!
+        let bookLat = book["bookLat"] as? String!
+        let bookLng = book["bookLng"] as? String!
+        let coditionOfBook = book["Condition"] as? String!
         
       
         
@@ -299,7 +311,7 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
         cell.imageView!.image = UIImage(data: data!)
  */
        
-        if bookRate == "Age Restricted"{
+        if bookRate == "Adult"{
         
             
             //cell.bookLabel?.numberOfLines = 0
@@ -308,7 +320,7 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
             
             
             cell.bookLabel?.text = "This book is age restricted that is why you are seeing a default image"
-+ "\n" + "Title: " + title! as String + "\n" + "Author: " + Author! as String + "\n" + "Comment: " + Comment! as String + "\n" + "Genre: " + Genre! as String + "\n" + "User: " + User! as String + "\n" + "Location: " + userLocation! as String
+                + "\n" + "Title: " + title! as String + "\n" + "Author: " + Author! as String + "\n" + "Comment: " + Comment! as String + "\n" + "Condition: " + coditionOfBook! as String + "\n" + "Genre: " + Genre! as String + "\n" + "User: " + User! as String + "\n" + "Location: " + userLocation! as String
            
             
 
@@ -326,13 +338,24 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
             
             cell.bookImageView.kf.indicatorType = .image(imageData: datas)
             
-            cell.bookImageView.setRounded()
+           // cell.bookImageView.setRounded()
+            
+            cell.bookImageView.layer.cornerRadius = 20.0
+            cell.bookImageView.clipsToBounds = true
+            cell.bookImageView.contentMode = .scaleToFill
+            
+            cell.contentView.layer.shadowColor = UIColor.black.cgColor
+            cell.contentView.layer.shadowOpacity = 0.98
+            cell.contentView.layer.shadowOffset = CGSize.zero
+            cell.contentView.layer.shadowRadius = 5.0
             
             
-            let processor = RoundCornerImageProcessor(cornerRadius: 100)
+            let processor = OverlayImageProcessor(overlay: .black, fraction: 0.75)
+            
+           // let processor = RoundCornerImageProcessor(cornerRadius: 100)
 
             
-            cell.bookImageView.kf.setImage(with: url, placeholder: UIImage(named:"old-books-436498_640.jpg"), options: [.transition(.fade(0.2))])
+            cell.bookImageView.kf.setImage(with: url, placeholder: UIImage(named:"old-books-436498_640.jpg"), options: [.transition(.fade(0.2)), .processor(processor)])
 
         
         
@@ -363,9 +386,8 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
       // cell.bookLabel?.numberOfLines = 0
         cell.bookLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
         
-        cell.bookLabel?.text = "Title: " + title! as String + "\n" + "Author: " + Author! as String + "\n" + "Tap for more info!"
-            
-
+        cell.bookLabel?.text = title! as String
+        cell.authorLabel.text = Author! as String
             
             
      
@@ -375,7 +397,7 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
         
        cell.bookLabel?.textColor = UIColor.white
         
-        cell.bookLabel?.font = UIFont(name: "Chalkduster", size: 20)
+       // cell.bookLabel?.font = UIFont(name: "Helvetica", size: 20)
         
         return cell
     }
@@ -391,7 +413,7 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
         
         if (segue.identifier == "upLoadThings"){
         
-        let viewController = segue.destination as! UploadViewController
+        let viewController = segue.destination as! BookuploadFormViewController
         
         
         }
@@ -415,20 +437,22 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
             let indexPath : IndexPath = self.tableView.indexPathForSelectedRow!
             
             
-            let moreInfoSnaphot:  FIRDataSnapshot! = self.SecondResultArray[indexPath.row]
+            let moreInfoSnaphot:  DataSnapshot! = self.SecondResultArray[indexPath.row]
             
-            let moreInfoCells = moreInfoSnaphot.value as! Dictionary<String, String>
+            let moreInfoCells = moreInfoSnaphot.value as! Dictionary<String, AnyObject>
             
-            let AuthorInfo = moreInfoCells["Author"] as String!
-            let CommentInfo = moreInfoCells["Comment"] as String!
-            let GenreInfo = moreInfoCells["Genre"] as String!
-            let UserInfo = moreInfoCells["User"] as String!
-            let titleInfo = moreInfoCells["title"] as String!
-            let bookPhotoInfo = moreInfoCells["bookPhoto"] as String!
-            let userIDInfo = moreInfoCells["userID"] as String!
-            let userPIC = moreInfoCells["userPhoto"] as String!
-            let userLocation = moreInfoCells["userLocation"] as String!
-            let userToBePushed = moreInfoCells["pushingID"] as String!
+            let AuthorInfo = moreInfoCells["Author"] as? String!
+            let CommentInfo = moreInfoCells["Comment"] as? String!
+            let GenreInfo = moreInfoCells["Genre"] as? String!
+            let UserInfo = moreInfoCells["User"] as? String!
+            let titleInfo = moreInfoCells["title"] as? String!
+            let bookPhotoInfo = moreInfoCells["bookPhoto"] as? String!
+            let userIDInfo = moreInfoCells["userID"] as? String!
+            let userPIC = moreInfoCells["userPhoto"] as? String!
+            let userLocation = moreInfoCells["userLocation"] as? String!
+            let userToBePushed = moreInfoCells["pushingID"] as? String!
+            let coditionOfBook = moreInfoCells["Condition"] as? String!
+            let theBookID = moreInfoSnaphot.key
             
             print(userToBePushed)
             
@@ -461,6 +485,14 @@ class ResultTableViewController: UITableViewController, DZNEmptyDataSetSource, D
             viewController.genreOfBook = GenreInfo
             viewController.titleOfBook = titleInfo
             viewController.userBeingPushedMSG = userToBePushed
+           
+            if coditionOfBook! == nil {
+                viewController.bookCondition = "The owner has not added the condition of the book"
+            }else{
+                viewController.bookCondition = coditionOfBook
+                
+            }
+            viewController.bookRequestedId = theBookID
             
             print("THIS IS THE USER TO BE PUSHED \(userToBePushed)")
         }

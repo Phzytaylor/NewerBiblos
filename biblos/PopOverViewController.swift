@@ -31,8 +31,8 @@ class PopOverViewController: UIViewController {
         
         if let rtfPath = Bundle.main.url(forResource: "Terms_of_Use", withExtension: "rtf") {
             do {
-                let attributedStringWithRtf = try NSAttributedString(url: rtfPath, options: [NSDocumentTypeDocumentAttribute:NSRTFTextDocumentType], documentAttributes: nil)
-                myTextView.attributedText = attributedStringWithRtf
+                let attributedStringWithRtf: NSAttributedString = try NSAttributedString(url: rtfPath, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.rtf], documentAttributes: nil)
+                self.myTextView.attributedText = attributedStringWithRtf
             } catch {
                 print("No rtf content found!")
             }

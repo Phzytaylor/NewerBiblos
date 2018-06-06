@@ -15,7 +15,7 @@ import Kingfisher
 
 
 
-let dataBase = FIRDatabase.database()
+let dataBase = Database.database()
 
  var refreshControl: UIRefreshControl = UIRefreshControl()
 
@@ -24,15 +24,52 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
     
     
     
+    
+    var keyArray: [String] = []
+    var dictionaryArray: [[String:AnyObject]] = []
+    var selectedCell: Int = 0
+    
+    var myBooksArray: [Book] = []
+   
+    
+    func imageWithGradient(img:UIImage!) -> UIImage {
+        
+        UIGraphicsBeginImageContext(img.size)
+        let context = UIGraphicsGetCurrentContext()
+        
+        img.draw(at: CGPoint(x: 0, y: 0))
+        
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let locations:[CGFloat] = [0.0, 1.0]
+        
+        let bottom = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5).cgColor
+        let top = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5).cgColor
+        
+        let colors = [top, bottom] as CFArray
+        
+        let gradient = CGGradient(colorsSpace: colorSpace, colors: colors, locations: locations)
+        
+        let startPoint = CGPoint(x: img.size.width/2, y: 0)
+        let endPoint = CGPoint(x: img.size.width/2, y: img.size.height)
+        
+        context!.drawLinearGradient(gradient!, start: startPoint, end: endPoint, options: CGGradientDrawingOptions(rawValue: UInt32(0)))
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        
+        return image!
+    }
+    
     func title(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
         let str = "You Haven't Uploaded A Book Yet!"
-        let attrs = [NSFontAttributeName: UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline)]
+        let attrs = [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: UIFontTextStyle.headline)]
         return NSAttributedString(string: str, attributes: attrs)
     }
     
     func description(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
         let str = "Tap The Upload Tab To Add A Book!"
-        let attrs = [NSFontAttributeName: UIFont.preferredFont(forTextStyle: UIFontTextStyle.body)]
+        let attrs = [NSAttributedStringKey.font: UIFont.preferredFont(forTextStyle: UIFontTextStyle.body)]
         return NSAttributedString(string: str, attributes: attrs)
     }
     
@@ -64,25 +101,84 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
 */
     
     
+    func trialFunc(){
+        guard let userID = Auth.auth().currentUser?.uid else {return}
+        
+       let usersBookRef = Database.database().reference().child("user-books").child(userID)
+        
+        usersBookRef.observeSingleEvent(of: .value) { (snapshot) in
+            guard let bookDictionary = snapshot.value as? [String:AnyObject] else {return}
+            
+            for (keys, values) in bookDictionary{
+                
+                let myBooksRef = Database.database().reference().child("books").child(keys)
+                
+                myBooksRef.observeSingleEvent(of: .value, with: { (snapshot) in
+                    
+                    if let dictionary = snapshot.value as? [String: AnyObject]{
+                        
+                        
+                        let book = Book()
+                        
+                        book.setValuesForKeys(dictionary)
+                        
+                        
+                        self.myBooksArray.append(book)
+                        
+                        print(book.Author)
+                        
+                        DispatchQueue.main.async(execute: {
+                            self.tableView.reloadData()
+                        })
+                        
+                        
+                        
+                        
+                    }
+                    
+                })
+                
+                
+            }
+        }
+    }
+    
     
     @IBOutlet weak var myBanner: GADBannerView!
     
     var bookKey: String!
     
+    var bookKeyArray:[String] = []
     
+    var myKeys:[String] = []
    
     
 
     override func viewDidLoad() {
+        self.tableView.separatorStyle = .none
+        var tutboard = UIStoryboard(name: "Tutorials", bundle: nil)
+      
+        if(!UserDefaults.standard.bool(forKey: "MyBooksfirstlaunch1.0")){
+            //Put any code here and it will be executed only once.
+            present(tutboard.instantiateViewController(withIdentifier: "bookTut"), animated: true, completion: nil)
+            print("Is a first launch")
+            UserDefaults.standard.set(true, forKey: "MyBooksfirstlaunch1.0")
+            UserDefaults.standard.synchronize();
+            
+        }
+        
         
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
         tableView.tableFooterView = UIView()
         
-        tableView.backgroundView = UIImageView( image: UIImage(named: "booksCoffee.jpg"))
+       // tableView.backgroundView = UIImageView( image: UIImage(named: "booksCoffee.jpg"))
         
+        tableView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
         
-       navigationController!.navigationBar.barTintColor = UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
+       //navigationController!.navigationBar.barTintColor = UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
+        
+        navigationController?.navigationBar.barTintColor = .black
         
         
         refreshControl?.addTarget(self, action: #selector(MyBooksTableViewController.refreshData), for: UIControlEvents.valueChanged)
@@ -90,7 +186,7 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
         refreshControl?.tintColor = UIColor.white
         refreshControl?.backgroundColor = UIColor.blue
         
-        refreshControl?.attributedTitle = NSAttributedString(string:"Fetching Your Books", attributes: [NSForegroundColorAttributeName : refreshControl?.tintColor])
+        refreshControl?.attributedTitle = NSAttributedString(string:"Fetching Your Books", attributes: [NSAttributedStringKey.foregroundColor : refreshControl?.tintColor])
         
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.hidesBackButton = true
@@ -105,14 +201,16 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
         
         
         
-      observeUserBooks()
+      //observeUserBooks()
         
+        trialFunc()
         
+        myBooks()
         
        
         
         tabBarController?.navigationItem.rightBarButtonItem?.tintColor = UIColor.white
-        self.tabBarController?.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Chalkduster", size: 20)!, NSForegroundColorAttributeName: UIColor.white]
+        self.tabBarController?.navigationController?.navigationBar.titleTextAttributes = [ NSAttributedStringKey.font: UIFont(name: "Bradley Hand", size: 20)!, NSAttributedStringKey.foregroundColor: UIColor.white]
         
        
         super.viewDidLoad()
@@ -121,19 +219,26 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
         tableView.estimatedRowHeight = 150
         
          UIApplication.shared.statusBarStyle = .lightContent
+        
+       
 
        
     }
     
     
-    func refreshData(){
+    @objc func refreshData(){
     
         
         BookArray.removeAll()
         
-        books.removeAll()
+       // books.removeAll()
         
-        observeUserBooks()
+        myBooksArray.removeAll()
+        
+        myBooks()
+        
+        //observeUserBooks()
+        trialFunc()
         
         tableView.reloadData()
         
@@ -148,19 +253,29 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
     override func viewDidDisappear(_ animated: Bool) {
         
         UIApplication.shared.isNetworkActivityIndicatorVisible = false
+         self.tabBarController?.navigationItem.leftBarButtonItem = nil
+         self.tabBarController?.navigationItem.rightBarButtonItem = nil
         
     }
     
+    @objc func toMyRequests(){
+        
+        performSegue(withIdentifier: "myRequests", sender: self)
+        
+        
+    }
   
     override func viewWillAppear(_ animated: Bool) {
         
          self.tabBarController?.navigationItem.titleView = nil
         self.tabBarController?.navigationItem.title = "My Books"
         
-        self.navigationItem.leftBarButtonItem = nil;
+        self.tabBarController?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "⚙️ Settings", style: .plain, target: self, action: #selector(showUserSettings))
         self.navigationItem.hidesBackButton = true
         
-       self.tabBarController?.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Chalkduster", size: 20)!, NSForegroundColorAttributeName: UIColor.white]        
+        self.tabBarController?.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "My requests", style: .plain, target: self, action: #selector(toMyRequests))
+        
+        self.tabBarController?.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
         
         
     
@@ -169,40 +284,63 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
     
    
     
-    var books = [Book]()
+   // var books = [Book]()
     
-    
+    @objc func showUserSettings(){
+        
+        performSegue(withIdentifier: "userSettings", sender: MyBooksTableViewController())
+        
+    }
     
    var bookDictionary = [String: Book]()
     
-    var BookArray: [FIRDataSnapshot]! = []
+    var BookArray: [DataSnapshot]! = []
     
+    
+    func myBooks(){
+        
+        guard let myUserID = Auth.auth().currentUser?.uid as String! else {
+            return
+        }
+        
+        let ref = Database.database().reference().child("user-books").child(myUserID)
+        
+        
+        ref.observe(.value) { (snapshot) in
+           
+            if snapshot.exists(){ var newDict = snapshot.value as! Dictionary<String, AnyObject>
+                
+                for (keys,values) in newDict {
+                    
+                    // print("I AM A KEY: " + keys)
+                    
+                    
+                    self.myKeys.append(keys)
+                    //self.bookKeyArray.append(keys)
+                    
+                    print(self.bookKeyArray)
+                    
+                    
+                }}
+           
+        }
+        
+    }
     
     
     func observeUserBooks() {
     
-        
-     
-        guard let uid = FIRAuth.auth()?.currentUser?.uid as String! else{
-        
+        guard let uid = Auth.auth().currentUser?.uid as String! else{
         
             return
-        
-        
+
         }
-        
-        
-     
-        
-       let ref = FIRDatabase.database().reference().child("user-books")
+ 
+        let ref = Database.database().reference().child("user-books")
         
        
         ref.observe(.childAdded, with: { (snapshot) in
-            
-            
-           
-            
-            
+      
             let userId = snapshot.key
             print(snapshot.childrenCount)
             
@@ -211,42 +349,38 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
             print(userId)
             
             if userId == uid {
+
+                let bookRef = Database.database().reference().child("user-books").child(userId)
           
-            
-                
-            let bookRef = FIRDatabase.database().reference().child("user-books").child(userId)
-                
-             
-            
             bookRef.observe(.childAdded, with: { (snapshot) in
                 
-                let bookID = snapshot.key
+                var bookID = snapshot.key
                 
-                print("This is new",snapshot.children)
+                print("This is new" ,snapshot.children)
                 
                 
                 print(bookID,"sigh..")
                 
+                
+                
                 self.bookKey = snapshot.key
+      
                 
-               
-                
-                let booksIDref = FIRDatabase.database().reference().child("books").child(bookID)
+                let booksIDref = Database.database().reference().child("books").child(bookID)
               
-                
-                
                 booksIDref.observe(.value, with: { (snapshot) in
                     
-                    
+                    self.keyArray.append(snapshot.key)
+
                     if let dictionary = snapshot.value as? [String: AnyObject]{
                     
                     
                         let book = Book()
                         
                         book.setValuesForKeys(dictionary)
+    
                         
-                        
-                        self.books.append(book)
+                     //   self.books.append(book)
                         
                         print(book.Author)
                         
@@ -275,17 +409,9 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
 
                 }, withCancel: nil) }
         
-          
-           
         
         }, withCancel: nil)
-        
-        
-       
-       
-       
-    
-    
+  
     }
     
     
@@ -298,7 +424,7 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
     }
 
     
-    func handleBookReloadTable() {
+    @objc func handleBookReloadTable() {
         
         
         //this will crash because of background thread, so lets call this on dispatch_async main thread
@@ -329,19 +455,29 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return books.count
+        return myBooksArray.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "myBookCell", for: indexPath) as! MyBooksTableViewCell
 
+     
+        
+         cell.backgroundColor = UIColor.clear
+       
        
         
-        // Configure the cell...
+      let book = myBooksArray[indexPath.row]
         
         
-        let book = books[indexPath.row]
+        
+       
+        
+       // let books = dictionaryArray[indexPath.row]
+        
+        
+        
         
         
        
@@ -357,10 +493,11 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
         let bookPhoto = book.bookPhoto as String!
         let userID = book.userID as String!
         let userLocation = book.userLocation as String!
+        let major = book.major as String!
+        let Requests = book.Requests as? Dictionary<String, Any>
         
         
-        
-        let processor = RoundCornerImageProcessor(cornerRadius: 7000)
+       // let processor = RoundCornerImageProcessor(cornerRadius: 50)
         
         
         
@@ -379,11 +516,25 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
      
         cell.myBookImageView.kf.indicatorType = .image(imageData: data)
 
-        cell.myBookImageView.setRounded()
+      //cell.myBookImageView.setRounded()
+        cell.myBookImageView.layer.cornerRadius = 20.0
+        //cell.myBookImageView.layer.borderWidth = 3.0
+        //cell.myBookImageView.layer.borderColor = #colorLiteral(red: 0.2050132155, green: 0.4215478003, blue: 0.1647726297, alpha: 1)
+        cell.myBookImageView.clipsToBounds = true
         
+        cell.contentView.layer.shadowColor = UIColor.black.cgColor
+        cell.contentView.layer.shadowOpacity = 0.98
+        cell.contentView.layer.shadowOffset = CGSize.zero
+        cell.contentView.layer.shadowRadius = 5.0
        
+        //cell.myBookLabel.layer.cornerRadius = 10.0
+        //cell.myBookLabel.layer.borderWidth = 3.0
+        //cell.myBookLabel.layer.borderColor = UIColor.white.cgColor
         
-        cell.myBookImageView.kf.setImage(with: url, placeholder: UIImage(named:"old-books-436498_640.jpg"), options: [.transition(.fade(0.2))])
+        
+      let processor = OverlayImageProcessor(overlay: .black, fraction: 0.75)
+        
+        cell.myBookImageView.kf.setImage(with: url, placeholder: UIImage(named:"old-books-436498_640.jpg"), options: [.transition(.fade(0.2)), .processor(processor)])
         
         cell.myBookImageView.backgroundColor = .clear
                 
@@ -402,16 +553,16 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
         
         
         
-        cell.myBookLabel?.text = "Title: " + "\n" + title! as String + "\n" + "Author: " + Author! as String + "\n"  + "Genre: " + Genre! as String
+        cell.myBookLabel?.text = title! as String
+        //cell.myBookLabel.sizeToFit()
+        //cell.myBookLabel?.textColor = .white
         
-        cell.myBookLabel?.textColor = .white
-        
-        cell.backgroundColor = UIColor.clear
+       
         
         
-        cell.myBookLabel?.textColor = UIColor.white
+       // cell.myBookLabel?.textColor = UIColor.white
         
-        cell.myBookLabel?.font = UIFont(name: "Chalkduster", size: 20)
+        //cell.myBookLabel?.font = UIFont(name: "SanFranciscoDisplay", size: 36)
         
 
         return cell
@@ -433,7 +584,7 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
             
             
             
-            guard let uid = FIRAuth.auth()?.currentUser?.uid as String! else{
+            guard let uid = Auth.auth().currentUser?.uid as String! else{
                 
                 
                 return
@@ -442,7 +593,9 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
             }
             
             
-            let book = books[indexPath.row]
+            //let book = books[indexPath.row]
+            
+            let book = myBooksArray[indexPath.row]
             
             
             
@@ -458,21 +611,44 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
             let bookPhoto = book.bookPhoto as String!
             let userID = book.userID as String!
             let userLocation = book.userLocation as String!
+            let major = book.major as String!
+            let college = book.college as String!
+            let bookID = "-" + book.bookID! as String
+            //let approvedUser = book.ApprovedRequestor as String!
+            if let requests = book.Requests as? [String:AnyObject] {
+                for (keys,values) in requests{
+                    let removeThisBookRef = Database.database().reference().child("users").child(keys).child("requestedBooks").child(bookID)
+                    
+                    removeThisBookRef.removeValue()
+                    
+                }
+            }
             
-        
-           let bookRef = dataBase.reference().child("books").child(self.bookKey)
             
-            let userBookRef = dataBase.reference().child("user-books").child(uid).child(self.bookKey)
+            
+            
+            let bookRef = dataBase.reference().child("books").child(bookID)
+            
+            let userBookRef = dataBase.reference().child("user-books").child(uid).child(bookID)
+            
+            let collegeAndMajorRef = dataBase.reference().child("colleges").child(college!).child(major!).child(bookID)
+            
+            let majorRef = dataBase.reference().child("majors").child(major!).child(bookID)
            
-            let storage = FIRStorage.storage()
+            let storage = Storage.storage()
             
              let storageRef = storage.reference(forURL: "gs://biblos-1.appspot.com")
             
-             let filePath =  ("/biblos-1.appspot.com/bookPhoto"+book.title!+(FIRAuth.auth()?.currentUser?.uid as String!))
+            let filePath =  ("/biblos-1.appspot.com/bookPhoto"+book.title!+(Auth.auth().currentUser?.uid as String!))
             
             bookRef.removeValue()
             
             userBookRef.removeValue()
+            
+            collegeAndMajorRef.removeValue()
+            majorRef.removeValue()
+            
+            bookKeyArray.removeAll()
             
                 // Delete the file
             storageRef.child(filePath).delete { error in
@@ -491,7 +667,9 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
             
             // Delete the row from the data source
             
-            books.remove(at: indexPath.row)
+           // books.remove(at: indexPath.row)
+            
+            myBooksArray.remove(at: indexPath.row)
             
         
             
@@ -500,9 +678,16 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
             
            BookArray.removeAll()
             
-            books.removeAll()
+           // books.removeAll()
+            myBooksArray.removeAll()
             
-            observeUserBooks()
+            myBooks()
+            
+            
+            
+           // observeUserBooks()
+            
+            trialFunc()
             
             self.tableView.reloadData()
             
@@ -518,6 +703,13 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
         }    
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        //performSegue(withIdentifier: "userRequests", sender: self)
+        
+        self.selectedCell = indexPath.row
+        
+    }
+    
     fileprivate func attemptReloadOfTable() {
         self.timer?.invalidate()
         
@@ -527,7 +719,7 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
  var timer: Timer?
     
     
-    func handleReloadTable() {
+    @objc func handleReloadTable() {
        
         
         //this will crash because of background thread, so lets call this on dispatch_async main thread
@@ -536,6 +728,44 @@ class MyBooksTableViewController: UITableViewController, DZNEmptyDataSetSource, 
         })
     }
 
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "userRequests"{
+            
+            var myArray:[String] = []
+            
+            let viewController = segue.destination as! RequestsTableViewController
+            
+            let indexPath : IndexPath = tableView.indexPathForSelectedRow!
+        
+          // let book = books[indexPath.row]
+            
+            let book = myBooksArray[indexPath.row]
+            
+            
+            
+            guard let Request = book.Requests as? Dictionary<String,AnyObject> else {return}
+            
+            for (keys,values) in Request{
+                
+                var mine = keys
+                
+                myArray.append(mine)
+                
+                
+                
+            }
+            
+            
+             viewController.bookRequestors = myArray
+            viewController.bookID = book.bookID!
+            if book.ApprovedRequestor != nil{
+                
+                viewController.approvedRequestorID = book.ApprovedRequestor!
+            }
+            
+            print("Testing me")
+        }
+    }
     
 }
 

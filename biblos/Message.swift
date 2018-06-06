@@ -17,13 +17,14 @@ class Message: NSObject {
     var toId: String?
     var toPushingID: String?
     var fromPushingID: String?
+   
     
    
     
     
     func chatPartnerId() -> String? {
     
-       if fromId == FIRAuth.auth()?.currentUser?.uid {
+        if fromId == Auth.auth().currentUser?.uid {
             return toId
         } else {
            return fromId

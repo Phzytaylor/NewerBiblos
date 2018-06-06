@@ -76,7 +76,7 @@ class MoreInfoViewController: UITableViewController,MFMailComposeViewControllerD
     
     
     
-    func reportUser() {
+    @objc func reportUser() {
     
         
         
@@ -138,7 +138,9 @@ class MoreInfoViewController: UITableViewController,MFMailComposeViewControllerD
         
         self.navigationController?.navigationBar.tintColor = UIColor.white
         
-        navigationController!.navigationBar.barTintColor = UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
+        //navigationController!.navigationBar.barTintColor = UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
+        
+         navigationController!.navigationBar.barTintColor = .black
         
         self.tabBarController?.navigationController!.navigationItem.backBarButtonItem?.tintColor = UIColor.white
         
@@ -194,7 +196,7 @@ class MoreInfoViewController: UITableViewController,MFMailComposeViewControllerD
         // Configure the cell...
         
         
-        cell.bookInfoLabel?.text = bookComment + "\n" + "Located in :" + "\n" + userLocate
+        cell.bookInfoLabel?.text = bookComment + "\n"
         //cell.textLabel?.numberOfLines = 0
         
         
@@ -204,7 +206,7 @@ class MoreInfoViewController: UITableViewController,MFMailComposeViewControllerD
         cell.backgroundColor = .clear
         
         
-        cell.bookInfoLabel?.font = UIFont(name: "Chalkduster", size: 30)
+        cell.bookInfoLabel?.font = UIFont(name: "Helvetica", size: 30)
         
 
         return cell

@@ -10,19 +10,13 @@ import UIKit
 import Firebase
 import FirebaseDatabase
 import FBSDKCoreKit
-import BWWalkthrough
+import DeviceKit
 
 
-class GenreTableViewController: UITableViewController, UISearchBarDelegate, BWWalkthroughViewControllerDelegate{
+class GenreTableViewController: UITableViewController, UISearchBarDelegate{
+    let dataBase = Database.database()
     
-    
-    var needWalkthrough:Bool = true
-    var walkthrough:BWWalkthroughViewController!
-    
-    
-    let dataBase = FIRDatabase.database()
-    
-    var modelName = UIDevice.current.modelName
+    var modelName = Device()
     
     
      let searchBar = UISearchBar()
@@ -238,6 +232,7 @@ class GenreTableViewController: UITableViewController, UISearchBarDelegate, BWWa
         
        
         //self.navigationItem.titleView = searchBar
+        tabBarController?.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(didLogOut))
         
         createSearchBar()
         
@@ -246,15 +241,42 @@ class GenreTableViewController: UITableViewController, UISearchBarDelegate, BWWa
         
     }
     
+    func imageWithGradient(img:UIImage!) -> UIImage {
+        
+        UIGraphicsBeginImageContext(img.size)
+        let context = UIGraphicsGetCurrentContext()
+        
+        img.draw(at: CGPoint(x: 0, y: 0))
+        
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let locations:[CGFloat] = [0.0, 1.0]
+        
+        let bottom = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5).cgColor
+        let top = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5).cgColor
+        
+        let colors = [top, bottom] as CFArray
+        
+        let gradient = CGGradient(colorsSpace: colorSpace, colors: colors, locations: locations)
+        
+        let startPoint = CGPoint(x: img.size.width/2, y: 0)
+        let endPoint = CGPoint(x: img.size.width/2, y: img.size.height)
+        
+        context!.drawLinearGradient(gradient!, start: startPoint, end: endPoint, options: CGGradientDrawingOptions(rawValue: UInt32(0)))
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        
+        return image!
+    }
     
     
-    
-    func didLogOut(){
+     @objc func didLogOut(){
         
         
         //signs user out of firebase app
         
-        try! FIRAuth.auth()!.signOut()
+        try! Auth.auth().signOut()
         
         //sign user out of facebook app
         
@@ -277,7 +299,9 @@ class GenreTableViewController: UITableViewController, UISearchBarDelegate, BWWa
         searchBar.showsCancelButton = false
         searchBar.placeholder = "Select a Genre"
         searchBar.delegate = self
-        self.tabBarController?.navigationItem.titleView = searchBar
+        //self.tabBarController?.navigationItem.titleView = searchBar
+        
+        self.navigationItem.titleView = searchBar
     
     }
     
@@ -285,141 +309,26 @@ class GenreTableViewController: UITableViewController, UISearchBarDelegate, BWWa
     override func viewDidLoad() {
         super.viewDidLoad()
         
-       tableView.backgroundView = UIImageView(image: UIImage(named: "nicelib.jpeg"))
+      createSearchBar()
+        
+       tableView.backgroundView = UIImageView(image: imageWithGradient(img: UIImage(named: "nicelib.jpeg")))
         
          UIApplication.shared.statusBarStyle = .lightContent
-        
-       
-        
-        let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
-        if launchedBefore  {
-            print("Not first launch.")
-        } else {
-            print("First launch, setting UserDefault.")
-            
-            
-            // Get view controllers and build the walkthrough
-            let stb = UIStoryboard(name: "Main", bundle: nil)
-            walkthrough = stb.instantiateViewController(withIdentifier: "walk") as! BWWalkthroughViewController
-            let page_one = stb.instantiateViewController(withIdentifier: "page_1")
-            let page_two = stb.instantiateViewController(withIdentifier: "page_2")
-            let page_three = stb.instantiateViewController(withIdentifier: "page_3")
-            let page_four = stb.instantiateViewController(withIdentifier: "page_4")
-            let page_five = stb.instantiateViewController(withIdentifier: "page_5")
-            let page_six = stb.instantiateViewController(withIdentifier: "page_6")
-            let page_seven = stb.instantiateViewController(withIdentifier: "page_7")
-            
-            // Attach the pages to the master
-            walkthrough.delegate = self
-            walkthrough.add(viewController:page_one)
-            walkthrough.add(viewController:page_two)
-            walkthrough.add(viewController:page_three)
-            walkthrough.add(viewController:page_four)
-            walkthrough.add(viewController: page_five)
-            walkthrough.add(viewController: page_six)
-            walkthrough.add(viewController: page_seven)
-            
-            self.present(walkthrough, animated: true) {
-                ()->() in
-                self.needWalkthrough = false
-            }
-            
 
-            
-            
-            
-            UserDefaults.standard.set(true, forKey: "launchedBefore")
-        }
+    
+       // navigationController!.navigationBar.barTintColor =  UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
         
- 
-        
- 
-        
-       /* //DELETE IT After Testing is done!
-        
-        // Get view controllers and build the walkthrough
-        let stb = UIStoryboard(name: "Main", bundle: nil)
-        walkthrough = stb.instantiateViewController(withIdentifier: "walk") as! BWWalkthroughViewController
-        let page_one = stb.instantiateViewController(withIdentifier: "page_1")
-        let page_two = stb.instantiateViewController(withIdentifier: "page_2")
-        let page_three = stb.instantiateViewController(withIdentifier: "page_3")
-        let page_four = stb.instantiateViewController(withIdentifier: "page_4")
-        let page_five = stb.instantiateViewController(withIdentifier: "page_5")
-        let page_six = stb.instantiateViewController(withIdentifier: "page_6")
-        let page_seven = stb.instantiateViewController(withIdentifier: "page_7")
-        
-        // Attach the pages to the master
-        walkthrough.delegate = self
-        walkthrough.add(viewController:page_one)
-        walkthrough.add(viewController:page_two)
-        walkthrough.add(viewController:page_three)
-        walkthrough.add(viewController:page_four)
-        walkthrough.add(viewController: page_five)
-        walkthrough.add(viewController: page_six)
-        walkthrough.add(viewController: page_seven)
-        
-        self.present(walkthrough, animated: true) {
-            ()->() in
-            self.needWalkthrough = false
-        }
+        navigationController?.navigationBar.barTintColor = .black
 
-        
-    
-    
-*/
-    
-    
-    
-        navigationController!.navigationBar.barTintColor =  UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
-        
-     
-       
-        
-        /* if modelName == Devices.IPhone7Plus{
-           
-            print("I am right")
-        
-        }
-        else {
-            print(modelName)
-        
-        }
-        //print(modelName)
-        
-        */
-        
-        
-        // self.navigationController?.navigationBar.barStyle = UIBarStyle.BlackTranslucent
-        
-        //sself.navigationController?.navigationBar.barTintColor=UIColor.blueColor()
-
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-        
-        
-        
-        
           tabBarController?.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(didLogOut))
         
         tabBarController?.navigationItem.rightBarButtonItem?.tintColor = UIColor.white
-        
-        
-      /*  tabBarController?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Book Map", style: .plain, target: self, action: #selector(booksNearBy))
-        
-        tabBarController?.navigationItem.leftBarButtonItem?.tintColor = UIColor.white */
-        
-        //createSearchBar()
         
     }
     
     
     func booksNearBy (){
     
-        
         
         let mainStoryboard: UIStoryboard = UIStoryboard(name:"Main", bundle: nil)
         
@@ -474,7 +383,7 @@ class GenreTableViewController: UITableViewController, UISearchBarDelegate, BWWa
             cell.textLabel?.text = filteredArray[indexPath.row]
              cell.textLabel?.textColor = .white
             
-             cell.textLabel?.font = UIFont(name: "Chalkduster", size: 16)
+             cell.textLabel?.font = UIFont(name: "Helvetica", size: 16)
             
             return cell
         
@@ -488,7 +397,7 @@ class GenreTableViewController: UITableViewController, UISearchBarDelegate, BWWa
             
             
             
-            cell.textLabel?.font = UIFont(name: "Chalkduster", size: 16)
+            cell.textLabel?.font = UIFont(name: "Helvetica", size: 16)
 
             
             
@@ -546,6 +455,8 @@ class GenreTableViewController: UITableViewController, UISearchBarDelegate, BWWa
                     let tappedItem = self.filteredArray[indexPath.row]
                     
                     viewController.someString = tappedItem
+                    
+                    
                 
                 }
                 else{
@@ -576,20 +487,6 @@ class GenreTableViewController: UITableViewController, UISearchBarDelegate, BWWa
 
 
 
-extension GenreTableViewController{
-    
-    func walkthroughCloseButtonPressed() {
-        self.dismiss(animated: true, completion: nil)
-    }
-    
-    func walkthroughPageDidChange(_ pageNumber: Int) {
-        if (self.walkthrough.numberOfPages - 1) == pageNumber{
-            self.walkthrough.closeButton?.isHidden = false
-        }else{
-            //self.walkthrough.closeButton?.isHidden = true
-        }
-    }
-    
-}
+
 
 

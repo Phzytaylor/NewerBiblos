@@ -15,7 +15,7 @@ import Firebase
 class booksNearByViewController: UIViewController, UINavigationControllerDelegate, UINavigationBarDelegate, CLLocationManagerDelegate, GADBannerViewDelegate {
     
   
-  var modelName = UIDevice.current.modelName
+  var modelName = UIDevice.current.model
    
     let manager = CLLocationManager()
     
@@ -65,8 +65,8 @@ class booksNearByViewController: UIViewController, UINavigationControllerDelegat
     
     
     func setupMyGoogleAd(){
-        
-        if modelName == Devices.IPhone6SPlus || modelName == Devices.IPhone7Plus || modelName == Devices.IPhone6Plus{
+        /*
+        if modelName == Model.iPhone6Splus || modelName == Model.iPhone7Plus || modelName == Model.iPhone6Plus{
             
             myBanner.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant:270).isActive = true
             myBanner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
@@ -76,7 +76,7 @@ class booksNearByViewController: UIViewController, UINavigationControllerDelegat
         
         
         
-        if modelName == Devices.IPadAir || modelName == Devices.IPad2 || modelName == Devices.IPad3 || modelName == Devices.IPad4 || modelName == Devices.IPadAir2 || modelName == Devices.IPadPro || modelName == Devices.IPadMini || modelName == Devices.IPadMini2 || modelName == Devices.Other{
+        if modelName == Model.iPadAir || modelName == Model.iPad2 || modelName == Devices.IPad3 || modelName == Devices.IPad4 || modelName == Devices.IPadAir2 || modelName == Devices.IPadPro || modelName == Devices.IPadMini || modelName == Devices.IPadMini2 || modelName == Devices.Other{
         
             myBanner.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant:400).isActive = true
             myBanner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
@@ -124,7 +124,7 @@ class booksNearByViewController: UIViewController, UINavigationControllerDelegat
         
         
         }
-        
+        */
         
     }
     
@@ -198,7 +198,7 @@ class booksNearByViewController: UIViewController, UINavigationControllerDelegat
         
         tabBarController?.navigationItem.leftBarButtonItem?.tintColor = UIColor.white
 
-        
+        tabBarController?.navigationItem.rightBarButtonItem = nil
        
         
         
@@ -206,7 +206,7 @@ class booksNearByViewController: UIViewController, UINavigationControllerDelegat
     
     
     
-    func mapRefresh(){
+    @objc func mapRefresh(){
     
     
         let allAnnotations = self.Map.annotations
@@ -255,7 +255,7 @@ class booksNearByViewController: UIViewController, UINavigationControllerDelegat
     }
     
     
-      let dataBase = FIRDatabase.database()
+    let dataBase = Database.database()
     
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -279,6 +279,21 @@ class booksNearByViewController: UIViewController, UINavigationControllerDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        var tutboard = UIStoryboard(name: "Tutorials", bundle: nil)
+        
+        if(!UserDefaults.standard.bool(forKey: "Mapfirstlaunch1.0")){
+            //Put any code here and it will be executed only once.
+            present(tutboard.instantiateViewController(withIdentifier: "mapTut"), animated: true, completion: nil)
+            print("Is a first launch")
+            UserDefaults.standard.set(true, forKey: "Mapfirstlaunch1.0")
+            UserDefaults.standard.synchronize();
+            
+        }
+        
+        tabBarController?.navigationItem.rightBarButtonItem = nil
+        
+        navigationController?.navigationBar.barTintColor = .black
+        
         manager.delegate = self
         
         manager.desiredAccuracy = kCLLocationAccuracyBest
@@ -293,8 +308,10 @@ class booksNearByViewController: UIViewController, UINavigationControllerDelegat
          UIApplication.shared.statusBarStyle = .lightContent
         
        
-         tabBarController?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(mapRefresh))
+         //tabBarController?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(mapRefresh))
        tabBarController?.navigationItem.leftBarButtonItem?.tintColor = UIColor.white
+        
+        
         
         
         postBooks()
@@ -311,9 +328,12 @@ class booksNearByViewController: UIViewController, UINavigationControllerDelegat
     }
     
     func setView(view: UIView, hidden: Bool) {
-        UIView.transition(with: view, duration: 0.5, options: .transitionCrossDissolve, animations: { _ in
+
+        UIView.transition(with: view, duration: 0.5, options: .transitionCrossDissolve, animations: {
             view.isHidden = hidden
         }, completion: nil)
+        
+        
     }
     
     

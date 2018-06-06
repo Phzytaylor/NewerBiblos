@@ -25,11 +25,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        FIRApp.configure()
+        FirebaseApp.configure()
         
        
         UINavigationBar.appearance().tintColor = UIColor.white
-        UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName:UIColor.white]
+        UINavigationBar.appearance().titleTextAttributes = [NSAttributedStringKey.foregroundColor:UIColor.white]
         UIApplication.shared.statusBarStyle = .lightContent
 
 
@@ -69,7 +69,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             alertView.show(alertView, sender: AnyObject.self)
         }
         
-        UINavigationBar.appearance().titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Chalkduster", size: 20)!, NSForegroundColorAttributeName: UIColor.white]
+        UINavigationBar.appearance().titleTextAttributes = [ NSAttributedStringKey.font: UIFont(name: "Chalkduster", size: 20)!, NSAttributedStringKey.foregroundColor: UIColor.white]
         
         return true
         

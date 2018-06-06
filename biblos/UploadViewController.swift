@@ -355,7 +355,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                     
                 }else{
                     
-                    let storage = FIRStorage.storage()
+                    let storage = Storage.storage()
                     
                     
                     // Create a storage reference from our storage service
@@ -363,7 +363,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                     let storageRef = storage.reference(forURL: "gs://biblos-1.appspot.com")
                     
                     
-                    let user = FIRAuth.auth()?.currentUser
+                    let user = Auth.auth().currentUser
                     var name = user!.displayName
                     
                     if user!.displayName == nil{
@@ -384,7 +384,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                     
                     imageData = UIImageJPEGRepresentation(imagePicked.image!,0.25)!
                     
-                    if FIRAuth.auth()?.currentUser?.photoURL?.absoluteString == nil {
+                    if Auth.auth().currentUser?.photoURL?.absoluteString == nil {
                         
                         
                         usersPhotoChoice = usersPhoto
@@ -392,7 +392,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                         
                     } else{
                         
-                        usersPhotoChoice = FIRAuth.auth()?.currentUser?.photoURL?.absoluteString
+                        usersPhotoChoice = Auth.auth().currentUser?.photoURL?.absoluteString
                         
                         
                     }
@@ -400,13 +400,15 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                     
                     let booksImageref = storageRef.child("book_images")
                     
-                    let filePath =  ("/biblos-1.appspot.com/bookPhoto"+bookTitle.text!+(FIRAuth.auth()?.currentUser?.uid as String!))
+                    let filePath =  ("/biblos-1.appspot.com/bookPhoto"+bookTitle.text!+(Auth.auth().currentUser?.uid as String!))
                     
-                    let metaData = FIRStorageMetadata()
+                    let metaData = StorageMetadata()
                     
                     metaData.contentType = "image/jpg"
                     
-                    storageRef.child(filePath).put(imageData, metadata: metaData){(metaData,error) in
+                    
+                    
+                    storageRef.child(filePath).putData(imageData, metadata: metaData){(metaData,error) in
                         if let error = error {
                             print(error.localizedDescription)
                             return
@@ -417,11 +419,11 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                             
                             
                             
-                            let ref = FIRDatabase.database().reference().child("books")
+                            let ref = Database.database().reference().child("books")
                             
                             let childRef = ref.childByAutoId()
                             
-                            let id = FIRAuth.auth()?.currentUser?.uid as String!
+                            let id = Auth.auth().currentUser?.uid as String!
                             
                             //Taylor you have to do a check for the user photo here, if they are using facebook this is fine, but if they use email and password you need can't just grab the users photo :(
                             
@@ -432,7 +434,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                                          "Comment": self.bookComment.text!,
                                          "User": name!,
                                          "bookPhoto": downloadURL,
-                                         "userID": FIRAuth.auth()?.currentUser?.uid as AnyObject!,
+                                         "userID": Auth.auth().currentUser?.uid as AnyObject!,
                                          "userPhoto": self.usersPhotoChoice as String!,
                                          "userLocation": self.locationField.text!,
                                          "bookRating": self.bookRating,
@@ -455,7 +457,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                                 
                                 
                                 
-                                let userBooksRef = FIRDatabase.database().reference().child("user-books").child(id!)
+                                let userBooksRef = Database.database().reference().child("user-books").child(id!)
                                 
                                 
                                 
@@ -538,7 +540,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                     
                 }else{
                     
-                    let storage = FIRStorage.storage()
+                    let storage = Storage.storage()
                     
                     
                     // Create a storage reference from our storage service
@@ -546,7 +548,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                     let storageRef = storage.reference(forURL: "gs://biblos-1.appspot.com")
                     
                     
-                    let user = FIRAuth.auth()?.currentUser
+                    let user = Auth.auth().currentUser
                     var name = user!.displayName
                     
                     if user!.displayName == nil{
@@ -567,7 +569,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                     
                     imageData = UIImageJPEGRepresentation(imagePicked.image!,0.25)!
                     
-                    if FIRAuth.auth()?.currentUser?.photoURL?.absoluteString == nil {
+                    if Auth.auth().currentUser?.photoURL?.absoluteString == nil {
                         
                         
                         usersPhotoChoice = usersPhoto
@@ -575,7 +577,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                         
                     } else{
                         
-                        usersPhotoChoice = FIRAuth.auth()?.currentUser?.photoURL?.absoluteString
+                        usersPhotoChoice = Auth.auth().currentUser?.photoURL?.absoluteString
                         
                         
                     }
@@ -583,13 +585,13 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                     
                     let booksImageref = storageRef.child("book_images")
                     
-                    let filePath =  ("/biblos-1.appspot.com/bookPhoto"+bookTitle.text!+(FIRAuth.auth()?.currentUser?.uid as String!))
+                    let filePath =  ("/biblos-1.appspot.com/bookPhoto"+bookTitle.text!+(Auth.auth().currentUser?.uid as String!))
                     
-                    let metaData = FIRStorageMetadata()
+                    let metaData = StorageMetadata()
                     
                     metaData.contentType = "image/jpg"
                     
-                    storageRef.child(filePath).put(imageData, metadata: metaData){(metaData,error) in
+                    storageRef.child(filePath).putData(imageData, metadata: metaData){(metaData,error) in
                         if let error = error {
                             print(error.localizedDescription)
                             return
@@ -600,11 +602,11 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                             
                             
                             
-                            let ref = FIRDatabase.database().reference().child("books")
+                            let ref = Database.database().reference().child("books")
                             
                             let childRef = ref.childByAutoId()
                             
-                            let id = FIRAuth.auth()?.currentUser?.uid as String!
+                            let id = Auth.auth().currentUser?.uid as String!
                             
                             //Taylor you have to do a check for the user photo here, if they are using facebook this is fine, but if they use email and password you need can't just grab the users photo :(
                             
@@ -615,7 +617,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                                          "Comment": self.bookComment.text!,
                                          "User": name!,
                                          "bookPhoto": downloadURL,
-                                         "userID": FIRAuth.auth()?.currentUser?.uid as AnyObject!,
+                                         "userID": Auth.auth().currentUser?.uid as AnyObject!,
                                          "userPhoto": self.usersPhotoChoice as String!,
                                          "userLocation": self.locationField.text!,
                                          "bookRating": self.bookRating,
@@ -638,7 +640,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                                 
                                 
                                 
-                                let userBooksRef = FIRDatabase.database().reference().child("user-books").child(id!)
+                                let userBooksRef = Database.database().reference().child("user-books").child(id!)
                                 
                                 
                                 
@@ -719,7 +721,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                 
             }else{
                 
-                let storage = FIRStorage.storage()
+                let storage = Storage.storage()
                 
                 
                 // Create a storage reference from our storage service
@@ -727,7 +729,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                 let storageRef = storage.reference(forURL: "gs://biblos-1.appspot.com")
                 
                 
-                let user = FIRAuth.auth()?.currentUser
+                let user = Auth.auth().currentUser
                 var name = user!.displayName
                 
                 if user!.displayName == nil{
@@ -748,7 +750,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                 
                 imageData = UIImageJPEGRepresentation(imagePicked.image!,0.25)!
                 
-                if FIRAuth.auth()?.currentUser?.photoURL?.absoluteString == nil {
+                if Auth.auth().currentUser?.photoURL?.absoluteString == nil {
                     
                     
                     usersPhotoChoice = usersPhoto
@@ -756,7 +758,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                     
                 } else{
                     
-                    usersPhotoChoice = FIRAuth.auth()?.currentUser?.photoURL?.absoluteString
+                    usersPhotoChoice = Auth.auth().currentUser?.photoURL?.absoluteString
                     
                     
                 }
@@ -764,13 +766,13 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                 
                 let booksImageref = storageRef.child("book_images")
                 
-                let filePath =  ("/biblos-1.appspot.com/bookPhoto"+bookTitle.text!+(FIRAuth.auth()?.currentUser?.uid as String!))
+                let filePath =  ("/biblos-1.appspot.com/bookPhoto"+bookTitle.text!+(Auth.auth().currentUser?.uid as String!))
                 
-                let metaData = FIRStorageMetadata()
+                let metaData = StorageMetadata()
                 
                 metaData.contentType = "image/jpg"
                 
-                storageRef.child(filePath).put(imageData, metadata: metaData){(metaData,error) in
+                storageRef.child(filePath).putData(imageData, metadata: metaData){(metaData,error) in
                     if let error = error {
                         print(error.localizedDescription)
                         return
@@ -781,11 +783,11 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                         
                         
                         
-                        let ref = FIRDatabase.database().reference().child("books")
+                        let ref = Database.database().reference().child("books")
                         
                         let childRef = ref.childByAutoId()
                         
-                        let id = FIRAuth.auth()?.currentUser?.uid as String!
+                        let id = Auth.auth().currentUser?.uid as String!
                         
                         //Taylor you have to do a check for the user photo here, if they are using facebook this is fine, but if they use email and password you need can't just grab the users photo :(
                         
@@ -796,7 +798,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                                      "Comment": self.bookComment.text!,
                                      "User": name!,
                                      "bookPhoto": downloadURL,
-                                     "userID": FIRAuth.auth()?.currentUser?.uid as AnyObject!,
+                                     "userID": Auth.auth().currentUser?.uid as AnyObject!,
                                      "userPhoto": self.usersPhotoChoice as String!,
                                      "userLocation": self.locationField.text!,
                                      "bookRating": self.bookRating,
@@ -819,7 +821,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
                             
                             
                             
-                            let userBooksRef = FIRDatabase.database().reference().child("user-books").child(id!)
+                            let userBooksRef = Database.database().reference().child("user-books").child(id!)
                             
                             
                             
@@ -891,7 +893,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
     @IBOutlet weak var imagePicked: UIImageView!
     
     
-    func dismissKeyboard() {
+    @objc func dismissKeyboard() {
         //Causes the view (or one of its embedded text fields) to resign the first responder status.
         view.endEditing(true)
     }
@@ -899,7 +901,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
     
     
     
-    let bookRef = FIRDatabase.database().reference().child("books")
+    let bookRef = Database.database().reference().child("books")
  
     
    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [AnyHashable: Any]!) {
@@ -989,7 +991,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
     override func viewWillAppear(_ animated: Bool) {
         self.tabBarController?.navigationItem.title = "Upload Your Book"
         
-        self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Chalkduster", size: 20)!, NSForegroundColorAttributeName: UIColor.white]
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSAttributedStringKey.font: UIFont(name: "Chalkduster", size: 20)!, NSAttributedStringKey.foregroundColor: UIColor.white]
         
         
          self.tabBarController?.navigationItem.titleView = nil
@@ -1007,12 +1009,12 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
     
     
     
-    func didLogOut(){
+    @objc func didLogOut(){
         
         
         //signs user out of firebase app
         
-        try! FIRAuth.auth()!.signOut()
+        try! Auth.auth().signOut()
         
         //sign user out of facebook app
         
@@ -1032,17 +1034,18 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
     
     
     
-    func keyboardWillShow(_ sender: Notification) {
+    @objc func keyboardWillShow(_ sender: Notification) {
         self.view.frame.origin.y = -150
     }
     
-    func keyboardWillHide(_ sender: Notification) {
+    @objc func keyboardWillHide(_ sender: Notification) {
         self.view.frame.origin.y = 0
     }
     
    //- MARK: ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         
         
         self.bookTitle.delegate = self
@@ -1070,14 +1073,14 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
         //manager.startUpdatingLocation()
         manager.desiredAccuracy = kCLLocationAccuracyBest
         
-      self.navigationController?.navigationBar.titleTextAttributes = [ NSFontAttributeName: UIFont(name: "Chalkduster", size: 20)!, NSForegroundColorAttributeName: UIColor.white]
+        self.navigationController?.navigationBar.titleTextAttributes = [ NSAttributedStringKey.font: UIFont(name: "Chalkduster", size: 20)!, NSAttributedStringKey.foregroundColor: UIColor.white]
         
         
         navigationController!.navigationBar.barTintColor = UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
         
-        let userIdForPic = FIRAuth.auth()?.currentUser?.uid as String!
+        let userIdForPic = Auth.auth().currentUser?.uid as String!
         
-        let nameRef = FIRDatabase.database().reference().child("users").child(userIdForPic!).child("name")
+        let nameRef = Database.database().reference().child("users").child(userIdForPic!).child("name")
         
         
         nameRef.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -1088,7 +1091,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
             }, withCancel: nil)
         
         
-        let picRef = FIRDatabase.database().reference().child("users").child(userIdForPic!).child("profileImageUrl")
+        let picRef = Database.database().reference().child("users").child(userIdForPic!).child("profileImageUrl")
         
         
         picRef.observeSingleEvent(of: .value, with: { (snapshot) in
@@ -1128,7 +1131,7 @@ class UploadViewController: UIViewController,UINavigationControllerDelegate, UII
         // Do any additional setup after loading the view.
     }
     
-    func pickCamorLib () {
+    @objc func pickCamorLib () {
     
         
         let refreshAlert = UIAlertController(title: "Upload", message: "Take a picure or select a photo.", preferredStyle: UIAlertControllerStyle.alert)

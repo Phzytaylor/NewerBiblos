@@ -10,10 +10,12 @@ import UIKit
 
 class MyBooksTableViewCell: UITableViewCell {
 
+    
     @IBOutlet weak var myBookLabel: UILabel!
     @IBOutlet weak var titleLabel: UILabel!
     //@IBOutlet weak var GenreLabel: UILabel!
     //@IBOutlet weak var GenreLabel: UILabel!
+    
     
     @IBOutlet weak var myBookImageView: UIImageView!
     

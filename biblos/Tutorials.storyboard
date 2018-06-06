@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina5_9" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Search Tutorial View Controller-->
+        <scene sceneID="awL-cS-ggZ">
+            <objects>
+                <viewController storyboardIdentifier="SearchTut" id="HER-Pn-eiH" customClass="SearchTutorialViewController" customModule="biblos" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ogz-Ry-JaX">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="udB-Nm-DuU">
+                                <rect key="frame" x="293" y="44" width="66" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="66" id="rTW-X3-8bN"/>
+                                </constraints>
+                                <state key="normal" title="skip">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="skipButtonTapped:" destination="HER-Pn-eiH" eventType="touchUpInside" id="5Ct-AK-KW2"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="bfA-wv-aTl" firstAttribute="trailing" secondItem="udB-Nm-DuU" secondAttribute="trailing" constant="16" id="3vf-wt-n55"/>
+                            <constraint firstItem="udB-Nm-DuU" firstAttribute="top" secondItem="bfA-wv-aTl" secondAttribute="top" id="RJB-Ah-tZz"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="bfA-wv-aTl"/>
+                    </view>
+                    <connections>
+                        <outlet property="skipButton" destination="udB-Nm-DuU" id="rTa-n4-5RO"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="sbd-qv-HcD" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="16.800000000000001" y="192.85714285714286"/>
+        </scene>
+        <!--Chat Tutorial View Controller-->
+        <scene sceneID="8dV-aw-xmn">
+            <objects>
+                <viewController storyboardIdentifier="chatTut" id="vK4-vf-Ugo" customClass="ChatTutorialViewController" customModule="biblos" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8Y8-W6-Qyr">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nBf-LD-vcU">
+                                <rect key="frame" x="293" y="44" width="66" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="66" id="j91-x2-9Kd"/>
+                                </constraints>
+                                <state key="normal" title="skip">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="skipButtonTapped:" destination="vK4-vf-Ugo" eventType="touchUpInside" id="IeR-tA-0gZ"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="nBf-LD-vcU" firstAttribute="top" secondItem="Mq9-dU-iix" secondAttribute="top" id="0Oh-Iq-IvA"/>
+                            <constraint firstItem="Mq9-dU-iix" firstAttribute="trailing" secondItem="nBf-LD-vcU" secondAttribute="trailing" constant="16" id="a4b-wp-5eH"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Mq9-dU-iix"/>
+                    </view>
+                    <connections>
+                        <outlet property="skipButton" destination="nBf-LD-vcU" id="bPI-De-oLf"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Unu-LG-cvE" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="690" y="193"/>
+        </scene>
+        <!--Book Views Tutorial View Controller-->
+        <scene sceneID="ybk-tr-zUo">
+            <objects>
+                <viewController storyboardIdentifier="bookTut" id="hex-uK-cHb" customClass="BookViewsTutorialViewController" customModule="biblos" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="10L-ru-cWq">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dfm-WU-hp0">
+                                <rect key="frame" x="313" y="44" width="46" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="46" id="hWY-6f-coe"/>
+                                </constraints>
+                                <state key="normal" title="skip">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="skipButtonTapped:" destination="hex-uK-cHb" eventType="touchUpInside" id="Xg1-Jh-TS3"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="mSe-w9-tw6" firstAttribute="trailing" secondItem="Dfm-WU-hp0" secondAttribute="trailing" constant="16" id="7gn-F6-yRL"/>
+                            <constraint firstItem="Dfm-WU-hp0" firstAttribute="top" secondItem="mSe-w9-tw6" secondAttribute="top" id="zee-vO-2wa"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="mSe-w9-tw6"/>
+                    </view>
+                    <connections>
+                        <outlet property="skipButton" destination="Dfm-WU-hp0" id="PCH-Rp-McA"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0QM-xs-DIl" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1468" y="193"/>
+        </scene>
+        <!--Map Tutorial View Controller-->
+        <scene sceneID="VIV-vM-x43">
+            <objects>
+                <viewController storyboardIdentifier="mapTut" id="YXn-Nq-lbA" customClass="MapTutorialViewController" customModule="biblos" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="UmZ-0c-O3B">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Pku-MU-I58">
+                                <rect key="frame" x="313" y="44" width="46" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="46" id="PmG-VM-ff6"/>
+                                </constraints>
+                                <state key="normal" title="skip">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="skipButtonTapped:" destination="YXn-Nq-lbA" eventType="touchUpInside" id="w8a-Uz-pR4"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="Pku-MU-I58" firstAttribute="top" secondItem="rkA-pw-FKr" secondAttribute="top" id="NlT-r5-Umb"/>
+                            <constraint firstItem="rkA-pw-FKr" firstAttribute="trailing" secondItem="Pku-MU-I58" secondAttribute="trailing" constant="16" id="dqg-Xd-bgK"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="rkA-pw-FKr"/>
+                    </view>
+                    <connections>
+                        <outlet property="skipButton" destination="Pku-MU-I58" id="7JQ-3c-Leb"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xti-PQ-ev3" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2260" y="193"/>
+        </scene>
+        <!--Upload Tutorial View Controller-->
+        <scene sceneID="oyD-2g-ngT">
+            <objects>
+                <viewController storyboardIdentifier="uploadTut" id="QIe-R9-7X9" customClass="UploadTutorialViewController" customModule="biblos" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="XWu-lP-ALI">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZkQ-qy-9xg">
+                                <rect key="frame" x="313" y="44" width="46" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="46" id="7cr-x0-P5W"/>
+                                </constraints>
+                                <state key="normal" title="skip">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="skipButtonTapped:" destination="QIe-R9-7X9" eventType="touchUpInside" id="h4S-5D-W1b"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="ZkQ-qy-9xg" firstAttribute="top" secondItem="219-xB-o6A" secondAttribute="top" id="4hK-bm-FJ8"/>
+                            <constraint firstItem="219-xB-o6A" firstAttribute="trailing" secondItem="ZkQ-qy-9xg" secondAttribute="trailing" constant="16" id="wpy-Pb-T8V"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="219-xB-o6A"/>
+                    </view>
+                    <connections>
+                        <outlet property="skipButton" destination="ZkQ-qy-9xg" id="YpK-MQ-26m"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1nV-gL-sVU" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3041" y="194"/>
+        </scene>
+    </scenes>
+</document>

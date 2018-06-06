@@ -14,4 +14,5 @@ class BooksTableViewCell: UITableViewCell {
 @IBOutlet weak var bookImageView: UIImageView!
 @IBOutlet weak var bookNameLabel: UILabel!
 
+    @IBOutlet weak var authorLabel: UILabel!
 }

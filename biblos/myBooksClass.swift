@@ -24,10 +24,12 @@ class Book: NSObject {
     var pushingID: String?
     var bookLat: NSNumber?
     var bookLng: NSNumber?
-
-
-
-
-
+    var major: String?
+    var college: String?
+    var Condition:String?
+    var Requests:AnyObject?
+    var RequestApproved: String?
+    var ApprovedRequestor: String?
+    var bookID: String?
 
 }

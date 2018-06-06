@@ -11,11 +11,12 @@ import Firebase
 import FirebaseAuth
 import FBSDKCoreKit
 import FirebaseStorage
+import DeviceKit
 
 
 
 
-let ProfilePicRef = FIRDatabase.database().reference(fromURL: "https://biblos-1.firebaseio.com/userPhototURL")
+let ProfilePicRef = Database.database().reference(fromURL: "https://biblos-1.firebaseio.com/userPhototURL")
 
 
 
@@ -50,7 +51,7 @@ class HomeViewController: UIViewController, GADBannerViewDelegate {
     
     }
     
-var modelName = UIDevice.current.modelName
+var modelName = Device()
 
    //var modelName = Devices.IPhone5
     
@@ -76,21 +77,11 @@ var modelName = UIDevice.current.modelName
         
     }()
     
-    
-    
-    
-    
-    
-    
+
     
     func setupProfileImageView() {
-        
-        
-        
-        //let myDevice = Devices.IPhone7Plus
-        
-        if modelName == Devices.IPhone7Plus || modelName == Devices.IPhone6Plus || modelName == Devices.IPhone6SPlus{
-            
+        switch modelName {
+        case .iPhone7Plus, .simulator(.iPhone7Plus), .iPhone8Plus, .simulator(.iPhone8Plus), .iPhone6Plus, .simulator(.iPhone6Plus), .iPhone6sPlus, .iPhoneX, .simulator(.iPhoneX):
             //need x, y, width, height constraints
             uiimvProfilePic.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
             //profileImageView.bottomAnchor.constraint(equalTo: loginRegisterSegmentedControl.topAnchor, constant: -30).isActive = true
@@ -103,14 +94,7 @@ var modelName = UIDevice.current.modelName
             
             //self.profileImageView.layer.frame = profileImageView.layer.frame.insetBy(dx: 0, dy: 0)
             
-            
-        }
-        
-        
-        
-        
-        if modelName == Devices.IPhone5 || modelName == Devices.IPhone5S || modelName == Devices.IPhone4 || modelName == Devices.IPhone4S || modelName == Devices.IPhoneSE{
-            
+        case .iPhone5, .simulator(.iPhone5), .iPhone5s, .simulator(.iPhone5s), .iPhone4, .simulator(.iPhone4), .iPhone4s, .simulator(.iPhone4s), .iPhoneSE, .simulator(.iPhoneSE):
             
             //need x, y, width, height constraints
             uiimvProfilePic.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
@@ -121,31 +105,18 @@ var modelName = UIDevice.current.modelName
             uiimvProfilePic.widthAnchor.constraint(equalToConstant: 130).isActive = true
             uiimvProfilePic.heightAnchor.constraint(equalToConstant: 130).isActive = true
             
-        }
-        
-        
-        if modelName == Devices.IPhone6 || modelName == Devices.IPhone6S || modelName == Devices.IPhone7 {
-        
-        
+        case .iPhone6, .simulator(.iPhone6), .iPhone6s, .simulator(.iPhone6s), .iPhone7, .simulator(.iPhone7), .iPhone8, .simulator(.iPhone8):
             
             //need x, y, width, height constraints
             uiimvProfilePic.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-           
+            
             uiimvProfilePic.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant:-200).isActive = true
             
             
             uiimvProfilePic.widthAnchor.constraint(equalToConstant: 170).isActive = true
             uiimvProfilePic.heightAnchor.constraint(equalToConstant: 170).isActive = true
-        
-        
-        }
-        
-        
-        
-        
-        if modelName == Devices.IPadAir || modelName == Devices.IPad2 || modelName == Devices.IPad3 || modelName == Devices.IPad4 || modelName == Devices.IPadAir2 || modelName == Devices.IPadPro || modelName == Devices.IPadMini || modelName == Devices.IPadMini2{
-        
-        
+            
+        case .iPadAir, .simulator(.iPadAir), .iPadAir2, .simulator(.iPadAir2), .iPad2, .simulator(.iPad2), .iPad3, .simulator(.iPad3), .iPad4, .simulator(.iPad4), .iPadPro9Inch, .simulator(.iPadPro9Inch), .iPadPro10Inch, .simulator(.iPadPro10Inch), .iPadPro12Inch, .simulator(.iPadPro12Inch), .iPadPro12Inch2, .simulator(.iPadPro12Inch2), .iPadMini, .simulator(.iPadMini), .iPadMini2, .simulator(.iPadMini2), .iPadMini3, .simulator(.iPadMini3), . iPadMini4, .simulator(.iPadMini4):
             //need x, y, width, height constraints
             uiimvProfilePic.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
             //profileImageView.bottomAnchor.constraint(equalTo: loginRegisterSegmentedControl.topAnchor, constant: -30).isActive = true
@@ -156,18 +127,8 @@ var modelName = UIDevice.current.modelName
             uiimvProfilePic.heightAnchor.constraint(equalToConstant: 200).isActive = true
             
             
-            //self.profileImageView.layer.frame = profileImageView.layer.frame.insetBy(dx: 0, dy: 0)
-            
-            
-
-        
-        
-        
-        }
-        
-        
-        if modelName == Devices.Other{
-        
+        //self.profileImageView.layer.frame = profileImageView.layer.frame.insetBy(dx: 0, dy: 0)
+        default:
             
             //need x, y, width, height constraints
             uiimvProfilePic.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
@@ -181,11 +142,9 @@ var modelName = UIDevice.current.modelName
             
             //self.profileImageView.layer.frame = profileImageView.layer.frame.insetBy(dx: 0, dy: 0)
 
-        
-        
         }
         
-        
+ 
     }
     
 
@@ -256,14 +215,18 @@ var modelName = UIDevice.current.modelName
     
     }
     
+    @objc func transfer(){
+        
+        performSegue(withIdentifier: "showMyTab", sender: AnyObject.self)
+    }
  
     lazy var continueButton: UIButton = {
     
         let moveOn = UIButton()
         
+         moveOn.addTarget(self, action: #selector(transfer), for: .touchUpInside)
         
-        
-        moveOn.addTarget(self, action: #selector(collectUserPhoto), for: .touchUpInside)
+       // moveOn.addTarget(self, action: #selector(collectUserPhoto), for: .touchUpInside)
         
          moveOn.backgroundColor = UIColor(red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
         
@@ -382,55 +345,35 @@ var modelName = UIDevice.current.modelName
     
     func setupMyGoogleAd(){
     
-        if modelName == Devices.IPhone6SPlus || modelName == Devices.IPhone7Plus || modelName == Devices.IPhone6Plus{
-        
-        myBanner.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant:300).isActive = true
-        myBanner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        myBanner.widthAnchor.constraint(equalToConstant: 320).isActive = true
-        
-            myBanner.heightAnchor.constraint(equalToConstant: 100).isActive = true }
-        
-        
-        if modelName == Devices.IPhone5 || modelName == Devices.IPhone5S || modelName == Devices.IPhone6 || modelName == Devices.IPhone6S || modelName == Devices.IPhone7 || modelName == Devices.IPhoneSE{
-        
+        switch modelName {
+        case .iPhone6sPlus, .simulator(.iPhone6sPlus), .iPhone6Plus, .simulator(.iPhone6Plus), .iPhone7Plus, .simulator(.iPhone7Plus), .iPhone8Plus, .simulator(.iPhone8Plus), .iPhoneX, .simulator(.iPhoneX):
+            myBanner.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant:300).isActive = true
+            myBanner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+            myBanner.widthAnchor.constraint(equalToConstant: 320).isActive = true
+            
+            myBanner.heightAnchor.constraint(equalToConstant: 100).isActive = true
+            
+        case .iPhone5, .simulator(.iPhone5), .iPhone5s, .simulator(.iPhone5s), .iPhone6, .simulator(.iPhone6), .iPhone6s, .simulator(.iPhone6s), .iPhone7, .simulator(.iPhone7), .iPhoneSE, .simulator(.iPhoneSE), .iPhone8, .simulator(.iPhone8):
             myBanner.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant:235).isActive = true
             myBanner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
             myBanner.widthAnchor.constraint(equalToConstant: 320).isActive = true
             
             myBanner.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        
-        
-        
-        
-        }
-    
-        
-        if modelName == Devices.IPadAir || modelName == Devices.IPad2 || modelName == Devices.IPad3 || modelName == Devices.IPad4 || modelName == Devices.IPadAir2 || modelName == Devices.IPadPro || modelName == Devices.IPadMini || modelName == Devices.IPadMini2{
-        
-        
+            
+        case .iPadAir, .simulator(.iPadAir), .iPadAir2, .simulator(.iPadAir2), .iPad2, .simulator(.iPad2), .iPad3, .simulator(.iPad3), .iPad4, .simulator(.iPad4), .iPadPro9Inch, .simulator(.iPadPro9Inch), .iPadPro10Inch, .simulator(.iPadPro10Inch), .iPadPro12Inch, .simulator(.iPadPro12Inch), .iPadPro12Inch2, .simulator(.iPadPro12Inch2), .iPadMini, .simulator(.iPadMini), .iPadMini2, .simulator(.iPadMini2), .iPadMini3, .simulator(.iPadMini3), . iPadMini4, .simulator(.iPadMini4):
+            
             myBanner.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant:435).isActive = true
             myBanner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
             myBanner.widthAnchor.constraint(equalToConstant: 728).isActive = true
             
             myBanner.heightAnchor.constraint(equalToConstant: 90).isActive = true
-            
-
-        }
-        
-        
-        if modelName == Devices.Other{
-        
+        default:
             myBanner.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant:435).isActive = true
             myBanner.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
             myBanner.widthAnchor.constraint(equalToConstant: 728).isActive = true
             
             myBanner.heightAnchor.constraint(equalToConstant: 90).isActive = true
-
-        
-        
-        
         }
-    
     }
     
     
@@ -560,10 +503,10 @@ var modelName = UIDevice.current.modelName
     
    // @IBOutlet weak var myBanner: GADBannerView!
     
-    var UsersLoginInforef = FIRDatabase.database().reference(fromURL: "https://biblos-1.firebaseio.com/")
+    var UsersLoginInforef = Database.database().reference(fromURL: "https://biblos-1.firebaseio.com/")
     
 
-    func termsAgreements() {
+    @objc func termsAgreements() {
         
         
         
@@ -578,16 +521,16 @@ var modelName = UIDevice.current.modelName
         
     }
 
-    func collectUserPhoto() {
+    @objc func collectUserPhoto() {
         
-        if let providerData = FIRAuth.auth()?.currentUser?.providerData {
+        if let providerData = Auth.auth().currentUser?.providerData {
             for userInfo in providerData {
                 switch userInfo.providerID {
                 case "facebook.com":
                     print("user is signed in with facebook")
                     
                     
-                    let itemRef = ProfilePicRef.child("\(FIRAuth.auth()?.currentUser?.displayName as String!) \(FIRAuth.auth()?.currentUser?.uid as String!)") // 1
+                    let itemRef = ProfilePicRef.child("\(Auth.auth().currentUser?.displayName as String!) \(Auth.auth().currentUser?.uid as String!)") // 1
                     
                     
                     
@@ -596,7 +539,7 @@ var modelName = UIDevice.current.modelName
                     
                     let messageItem = [ // 2
                         
-                        "userProfilePic": FIRAuth.auth()?.currentUser?.photoURL?.absoluteString as AnyObject!
+                        "userProfilePic": Auth.auth().currentUser?.photoURL?.absoluteString as AnyObject!
                     ]
                     
                     
@@ -622,41 +565,86 @@ var modelName = UIDevice.current.modelName
     
     //MARK:Properties
     
-    //@IBOutlet weak var uiimvProfilePic: UIImageView!
+  
     
-    
-    
-    
-    
-    
-    
-   // @IBOutlet weak var uilName: UILabel!
-    
-    
-    //MARK: Actions
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        
+        let firstLaunch = FirstLaunch(userDefaults: .standard, key: "com.any-suggestion.FirstLaunch.WasLaunchedBefore")
+        if firstLaunch.isFirstLaunch {
+            // do things
+
+            present(MoreUserInfoViewController(), animated: true, completion: nil)
+        }
+        
+//        let alwaysFirstLaunch = FirstLaunch(getWasLaunchedBefore: { return false }, setWasLaunchedBefore: { _ in })
+//        if alwaysFirstLaunch.isFirstLaunch {
+//            // will always execute
+//            present(MoreUserInfoViewController(), animated: true, completion: nil)
+//        }
        
-    
-    
-    
-    /*func circularImage(_ photoImageView: UIImageView?)
-    {
-        photoImageView!.layer.frame = photoImageView!.layer.frame.insetBy(dx: 0, dy: 0)
-        photoImageView!.layer.borderColor = UIColor.gray.cgColor
-        photoImageView!.layer.cornerRadius = photoImageView!.frame.height/2
-        photoImageView!.layer.masksToBounds = false
-        photoImageView!.clipsToBounds = true
-        photoImageView!.layer.borderWidth = 0.5
-        photoImageView!.contentMode = UIViewContentMode.scaleAspectFill
+        
+        view.addSubview(myBanner)
+        
+        setupMyGoogleAd()
+        
+        
+        view.addSubview(bookCounter)
+        
+        setupBookCounter()
     }
-    */
     
-    
-    
-    
+    func presentAlert() {
+        let alertController = UIAlertController(title: "Username?", message: "Some how you got by without a username please enter one now:", preferredStyle: .alert)
+        
+        let confirmAction = UIAlertAction(title: "Confirm", style: .default) { (_) in
+            if let field = alertController.textFields?[0] {
+                // store your data
+                var user = Auth.auth().currentUser?.createProfileChangeRequest()
+                user?.displayName = field.text
+                
+                user?.commitChanges { error in
+                    if let error = error {
+                        // An error happened.
+                    } else {
+                        // Profile updated.
+                    }
+                }
+                
+                
+            } else {
+                // user did not fill field
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (_) in }
+        
+        alertController.addTextField { (textField) in
+            textField.placeholder = "Taylor"
+        }
+        
+        alertController.addAction(confirmAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+    }
     
      
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
+        DispatchQueue.main.async {
+            if Auth.auth().currentUser?.displayName == nil {
+                self.presentAlert()
+                
+            }
+        }
+                
+       
+        
+       
+        
         
         view.addSubview(uiimvProfilePic)
         
@@ -683,14 +671,7 @@ var modelName = UIDevice.current.modelName
         
         setupConditionsButt()
         
-        view.addSubview(myBanner)
-        
-        setupMyGoogleAd()
-        
-        
-        view.addSubview(bookCounter)
-        
-        setupBookCounter()
+       
         
         view.addSubview(aivLoadingSpinner)
         
@@ -712,7 +693,7 @@ var modelName = UIDevice.current.modelName
             })
             
             
-            if let providerData = FIRAuth.auth()?.currentUser?.providerData {
+        if let providerData = Auth.auth().currentUser?.providerData {
                 for userInfo in providerData {
                     switch userInfo.providerID {
                     case "facebook.com":
@@ -728,38 +709,34 @@ var modelName = UIDevice.current.modelName
             
         
             
-            var bookCountRef = FIRDatabase.database().reference().child("books")
+        var bookCountRef = Database.database().reference().child("books")
+        
+        
+        DispatchQueue.main.async(execute: {
+            
             
             bookCountRef.observe(.value, with: { (snapshot) in
                 
                 print(snapshot.childrenCount)
                 
-                self.bookCounter.text = "\(snapshot.childrenCount) books shared so far!"
+                self.bookCounter.text = "\(snapshot.childrenCount) books have been shared by others"
+                
+             
+                
                 
             }, withCancel: nil)
+                
+                
+            })
+
             
-            
-            // Do any additional setup after loading the view.
-            
-            
-            //self.uiimvProfilePic.layer.cornerRadius = self.uiimvProfilePic.frame.size.width/2
-            
-            
-            
-            // self.uiimvProfilePic.clipsToBounds = true
-            
-            
-            //circularImage(uiimvProfilePic)
-            
-            
-            
-            if let providerData = FIRAuth.auth()?.currentUser?.providerData {
+        if let providerData = Auth.auth().currentUser?.providerData {
                 for userInfo in providerData {
                     switch userInfo.providerID {
                     case "facebook.com":
                         print("user is signed in with facebook")
                         
-                        if let user = FIRAuth.auth()?.currentUser {
+                        if let user = Auth.auth().currentUser {
                             
                             // User is signed in.
                             
@@ -777,7 +754,7 @@ var modelName = UIDevice.current.modelName
                             
                             //reference to firebase storage service
                             
-                            let storage = FIRStorage.storage()
+                            let storage = Storage.storage()
                             
                             //refer your particular storage service
                             
@@ -791,7 +768,7 @@ var modelName = UIDevice.current.modelName
                             
                             
                             // Download in memory with a maximum allowed size of 1MB (1 * 1024 * 1024 bytes)
-                            profilePicRef.data(withMaxSize: 1 * 1024 * 1024) { (data, error) -> Void in
+                            profilePicRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) -> Void in
                                 if (error != nil) {
                                     // Uh-oh, an error occurred!
                                     
@@ -830,14 +807,16 @@ var modelName = UIDevice.current.modelName
                                         
                                         
                                         
-                                    else{
+                                   /* else{
                                         
                                         let UserEmail = FBSDKGraphRequest.init(graphPath: "me", parameters: ["fields":"email"]).start { (connection, result, error) -> Void in
                                             
                                             
                                             let strEmail: String = ((result as AnyObject).object(forKey: "email") as? String)!
                                             
+                                            let userEducation = FBSDKGraphRequest.init(graphPath: "me", parameters: ["fields":"education"])
                                             
+                                            print(userEducation)
                                             
                                             
                                             
@@ -849,12 +828,12 @@ var modelName = UIDevice.current.modelName
                                             
                                             //print ((FIRAuth.auth()?.currentUser?.photoURL?.absoluteString) as String!)
                                             
-                                            let values = ["name": FIRAuth.auth()?.currentUser?.displayName as String!, "email": strEmail, "profileImageUrl":(FIRAuth.auth()?.currentUser?.photoURL?.absoluteString) as String! , "pushID": PushingID]
+                                            let values = ["name": Auth.auth().currentUser?.displayName as String!, "email": strEmail, "profileImageUrl":(Auth.auth().currentUser?.photoURL?.absoluteString) as String! , "pushID": PushingID]
                                             
                                             
                                             
                                             
-                                            self.registerUserIntoDatabaseWithUID(FIRAuth.auth()?.currentUser?.uid as String!, values: values as [String : AnyObject])
+                                            self.registerUserIntoDatabaseWithUID(Auth.auth().currentUser?.uid as String!, values: values as [String : AnyObject])
                                             
                                             
                                             
@@ -863,110 +842,23 @@ var modelName = UIDevice.current.modelName
                                         
                                         
                                         
-                                    }
+                                    } */
                                     
                                 }
                             }
-                            
-                            
-                            if(self.uiimvProfilePic.image == nil) {
-                                
-                                
-                                
-                                let profilePic = FBSDKGraphRequest(graphPath: "me/picture", parameters: ["height":300, "width":300,"redirect":false], httpMethod: "GET")
-                                profilePic?.start(completionHandler: {(connection, result, error) -> Void in
-                                    // Handle the result
-                                    
-                                    
-                                    if (error == nil){
-                                        
-                                        let dictionary = result as? NSDictionary
-                                        
-                                        let data = dictionary?.object(forKey: "data")
-                                        
-                                        let urlPic = ((data as AnyObject).object(forKey: "url"))! as! String
-                                        
-                                        if let imagedata = try? Data(contentsOf: URL(string: urlPic)!){
-                                            
-                                            
-                                            
-                                            
-                                            
-                                            let uploadTask = profilePicRef.put(imagedata, metadata:nil){
-                                                
-                                                
-                                                metadata,error in
-                                                
-                                                if (error == nil){
-                                                    
-                                                    let downloadUrl = metadata!.downloadURL
-                                                    
-                                                }
-                                                    
-                                                else{
-                                                    
-                                                    
-                                                    print("ERROR IN DOWNLOAIND IMAGE")
-                                                    
-                                                }
-                                            }
-                                            
-                                            self.uiimvProfilePic.image = UIImage(data:imagedata)?.circleMasked
-                                            
-                                            
-                                            
-                                            
-                                            
-                                        }
-                                        
-                                    }
-                                })
-                                
-                                
-                            } //end if
-                            
+                         
                             
                         } else {
                             // No user is signed in.
                         }
                         
                         
-                        
-                        /* let UserEmail = FBSDKGraphRequest.init(graphPath: "me", parameters: ["fields":"email"]).startWithCompletionHandler { (connection, result, error) -> Void in
-                         
-                         
-                         let strEmail: String = (result.objectForKey("email") as? String)!
-                         
-                         
-                         
-                         
-                         
-                         
-                         
-                         
-                         
-                         //  print (strEmail)
-                         
-                         //print ((FIRAuth.auth()?.currentUser?.photoURL?.absoluteString) as String!)
-                         
-                         let values = ["name": FIRAuth.auth()?.currentUser?.displayName as String!, "email": strEmail, "profileImageUrl":(FIRAuth.auth()?.currentUser?.photoURL?.absoluteString) as String! ]
-                         
-                         
-                         
-                         
-                         self.registerUserIntoDatabaseWithUID(FIRAuth.auth()?.currentUser?.uid as String!, values: values)
-                         
-                         
-                         
-                         }*/
-                        
-                        
-                        let values = ["name": FIRAuth.auth()?.currentUser?.displayName as String!, "email": FIRAuth.auth()?.currentUser?.email as String!, "profileImageUrl":(FIRAuth.auth()?.currentUser?.photoURL?.absoluteString) as String!] //"pushID": self.userPushID ]
+                        let values = ["name": Auth.auth().currentUser?.displayName as String!, "email": Auth.auth().currentUser?.email as String!, "profileImageUrl":(Auth.auth().currentUser?.photoURL?.absoluteString) as String!] //"pushID": self.userPushID ]
                         
                         
                         
                         
-                        self.registerUserIntoDatabaseWithUID(FIRAuth.auth()?.currentUser?.uid as String!, values: values as [String : AnyObject])
+                    //    self.registerUserIntoDatabaseWithUID(Auth.auth().currentUser?.uid as String!, values: values as [String : AnyObject])
                         
                         
                         
@@ -974,11 +866,11 @@ var modelName = UIDevice.current.modelName
                     default:
                         print("user is signed in with \(userInfo.providerID)")
                         
-                        print("this is empty?", FIRAuth.auth()?.currentUser?.photoURL)
+                        print("this is empty?", Auth.auth().currentUser?.photoURL)
                         
-                        let userIdForPic = FIRAuth.auth()?.currentUser?.uid as String!
+                        let userIdForPic = Auth.auth().currentUser?.uid as String!
                         
-                        let picRef = FIRDatabase.database().reference().child("users").child(userIdForPic!).child("profileImageUrl")
+                        let picRef = Database.database().reference().child("users").child(userIdForPic!).child("profileImageUrl")
                         
                         picRef.observe(.value, with: { (snapshot) in
                             
@@ -1032,7 +924,7 @@ var modelName = UIDevice.current.modelName
                         
                         
                         
-                        let userNameRef = FIRDatabase.database().reference().child("users").child(userIdForPic!).child("name")
+                        let userNameRef = Database.database().reference().child("users").child(userIdForPic!).child("name")
                         
                         userNameRef.observeSingleEvent(of: .value, with: { (snapshot) in
                             
@@ -1047,33 +939,12 @@ var modelName = UIDevice.current.modelName
                 }
                 
             }
-            
-            
-            
-            
-            
-        
-            
-            
-            
-            
-       
-
-        
+   
     }
-    
-    
-  /*  override var shouldAutorotate : Bool {
-        return false
-    }
-    
-    override var supportedInterfaceOrientations : UIInterfaceOrientationMask {
-        return UIInterfaceOrientationMask.portrait
-    } */
-    
+ 
     
     fileprivate func registerUserIntoDatabaseWithUID(_ uid: String, values: [String: AnyObject]) {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         let usersReference = ref.child("users").child(uid)
         
         usersReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
